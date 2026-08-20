@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="620" viewBox="0 0 1440 620" font-family="Malgun Gothic, 맑은 고딕, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+  <title>라. 추진일정 (9월~11월, 약 7주)</title>
+  <rect width="1440" height="620" fill="#ffffff"/>
+
+  <!-- ================= 좌측 헤더 ================= -->
+  <rect x="24" y="20" width="300" height="74" rx="8" fill="#EEF3FA" stroke="#C9D6EA" stroke-width="1.5"/>
+  <text x="174" y="52" font-size="19" font-weight="bold" fill="#1F3864" text-anchor="middle">추진 과제</text>
+  <text x="174" y="76" font-size="14" fill="#5A6472" text-anchor="middle">9월 ~ 11월 · 약 7주</text>
+
+  <!-- ================= 월 밴드 ================= -->
+  <rect x="324" y="20" width="464" height="36" rx="6" fill="#1F3864"/>
+  <text x="556" y="45" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">9월</text>
+  <rect x="792" y="20" width="308" height="36" rx="6" fill="#2E5AAC"/>
+  <text x="946" y="45" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">10월</text>
+  <rect x="1104" y="20" width="312" height="36" rx="6" fill="#17823F"/>
+  <text x="1260" y="45" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">11월</text>
+
+  <!-- ================= 주차 헤더 ================= -->
+  <g>
+    <rect x="324" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="480" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="636" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="792" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="948" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="1104" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+    <rect x="1260" y="58" width="156" height="36" fill="#EEF3FA" stroke="#DCE4F0"/>
+  </g>
+  <g font-size="16" font-weight="bold" fill="#1F3864" text-anchor="middle">
+    <text x="402" y="83">1주차</text><text x="558" y="83">2주차</text><text x="714" y="83">3주차</text>
+    <text x="870" y="83">4주차</text><text x="1026" y="83">5주차</text><text x="1182" y="83">6주차</text>
+    <text x="1338" y="83">7주차</text>
+  </g>
+
+  <!-- ================= 행 배경 + 주차 격자 ================= -->
+  <rect x="324" y="100" width="1092" height="372" fill="#FCFDFE"/>
+  <g stroke="#E4E9F2" stroke-width="1">
+    <path d="M324 100 V472"/><path d="M480 100 V472"/><path d="M636 100 V472"/><path d="M792 100 V472"/>
+    <path d="M948 100 V472"/><path d="M1104 100 V472"/><path d="M1260 100 V472"/><path d="M1416 100 V472"/>
+    <path d="M24 162 H1416"/><path d="M24 224 H1416"/><path d="M24 286 H1416"/>
+    <path d="M24 348 H1416"/><path d="M24 410 H1416"/>
+  </g>
+  <rect x="24" y="100" width="300" height="372" fill="none" stroke="#E4E9F2"/>
+
+  <!-- ---- R1 : 1주차 ---- -->
+  <path d="M44 148 a13 11 0 0 1 24 0 z" fill="#5A6472"/>
+  <circle cx="56" cy="128" r="14" fill="#FBDCC4"/>
+  <ellipse cx="56" cy="116" rx="14.5" ry="7.5" fill="#3D4A5C"/>
+  <circle cx="51" cy="128" r="1.7" fill="#33404F"/>
+  <circle cx="61" cy="128" r="1.7" fill="#33404F"/>
+  <ellipse cx="56" cy="136" rx="4" ry="2.8" fill="#E06A6A"/>
+  <text x="82" y="130" font-size="17" font-weight="bold" fill="#1F3864">실증기관 협의</text>
+  <text x="82" y="151" font-size="13.5" fill="#5A6472">기록 서식 분석·요구사항 확정</text>
+  <rect x="332" y="114" width="140" height="34" rx="17" fill="#5A6472"/>
+  <text x="402" y="136" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">협의·분석</text>
+
+  <!-- ---- R2 : 2~3주차 ---- -->
+  <circle cx="56" cy="193" r="15" fill="#1F3864"/>
+  <text x="56" y="199" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="82" y="192" font-size="17" font-weight="bold" fill="#1F3864">기능 ① 음성→기록 초안</text>
+  <text x="82" y="213" font-size="13.5" fill="#5A6472">기록 서식 정합성 검증</text>
+  <rect x="488" y="176" width="296" height="34" rx="17" fill="#1F3864"/>
+  <text x="636" y="198" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">기능 ① 개발 · 최소 완성요건 확보</text>
+
+  <!-- ---- R3 : 4주차 ---- -->
+  <circle cx="56" cy="255" r="15" fill="#5B2C8D"/>
+  <text x="56" y="261" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="82" y="254" font-size="17" font-weight="bold" fill="#1F3864">기능 ③ 이상징후 플래깅</text>
+  <text x="82" y="275" font-size="13.5" fill="#5A6472">중간발표 대응 (10월 중)</text>
+  <rect x="800" y="238" width="140" height="34" rx="17" fill="#5B2C8D"/>
+  <text x="870" y="260" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">기능 ③ 개발</text>
+
+  <!-- ---- R4 : 5주차 ---- -->
+  <circle cx="56" cy="317" r="15" fill="#17823F"/>
+  <text x="56" y="323" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="82" y="316" font-size="17" font-weight="bold" fill="#1F3864">기능 ② 인수인계 브리핑</text>
+  <text x="82" y="337" font-size="13.5" fill="#5A6472">기관별 기록 통합·요약</text>
+  <rect x="956" y="300" width="140" height="34" rx="17" fill="#17823F"/>
+  <text x="1026" y="322" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">기능 ② 개발</text>
+
+  <!-- ---- R5 : 6~7주차 ---- -->
+  <path d="M44 396 a13 11 0 0 1 24 0 z" fill="#7B8CA6"/>
+  <circle cx="56" cy="376" r="14" fill="#FBDCC4"/>
+  <ellipse cx="56" cy="364" rx="14.5" ry="7.5" fill="#C7CDD6"/>
+  <circle cx="51" cy="376" r="1.7" fill="#33404F"/>
+  <circle cx="61" cy="376" r="1.7" fill="#33404F"/>
+  <path d="M51 383 q5 4 10 0" fill="none" stroke="#E06A6A" stroke-width="2" stroke-linecap="round"/>
+  <text x="82" y="378" font-size="17" font-weight="bold" fill="#1F3864">현장 파일럿</text>
+  <text x="82" y="399" font-size="13.5" fill="#5A6472">돌봄인력 5~10명 실사용 2주</text>
+  <rect x="1112" y="362" width="296" height="34" rx="17" fill="#ED7D31"/>
+  <text x="1260" y="384" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">현장 파일럿 2주 · 누적 기록 200건</text>
+
+  <!-- ---- R6 : 7주차 ---- -->
+  <circle cx="56" cy="441" r="15" fill="#2E5AAC"/>
+  <path d="M49 441 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="82" y="440" font-size="17" font-weight="bold" fill="#1F3864">성과 측정 · 개선</text>
+  <text x="82" y="461" font-size="13.5" fill="#5A6472">피드백 반영 · 성과발표 자료</text>
+  <rect x="1268" y="424" width="140" height="34" rx="17" fill="#2E5AAC"/>
+  <text x="1338" y="446" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">성과 정리</text>
+
+  <!-- ================= 마일스톤 ================= -->
+  <rect x="24" y="472" width="1392" height="52" fill="#EEF3FA" stroke="#E4E9F2"/>
+  <text x="48" y="504" font-size="16" font-weight="bold" fill="#1F3864">주요 마일스톤</text>
+  <path d="M870 487 L881 498 L870 509 L859 498 Z" fill="#ED7D31"/>
+  <text x="892" y="504" font-size="15" font-weight="bold" fill="#1F3864">중간발표 (10월)</text>
+  <path d="M1338 487 L1349 498 L1338 509 L1327 498 Z" fill="#ED7D31"/>
+  <text x="1316" y="504" font-size="15" font-weight="bold" fill="#1F3864" text-anchor="end">성과발표 (11월)</text>
+
+  <!-- ================= FOOTER ================= -->
+  <rect x="24" y="542" width="1392" height="58" rx="10" fill="#1F3864"/>
+  <circle cx="64" cy="571" r="16" fill="#ffffff"/>
+  <rect x="55" y="565" width="18" height="14" rx="2.5" fill="none" stroke="#1F3864" stroke-width="2.4"/>
+  <path d="M55 570 h18" stroke="#1F3864" stroke-width="2.4"/>
+  <path d="M60 561 v6 M68 561 v6" stroke="#1F3864" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="770" y="579" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle"><tspan fill="#FFC24D">기능 ①을 최소 완성요건으로 우선 확보</tspan>한 뒤 ③ · ② 를 순차 추가하는 단계적 개발로 7주 일정 리스크를 최소화합니다.</text>
+</svg>

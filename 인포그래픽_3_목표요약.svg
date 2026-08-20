@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="790" viewBox="0 0 1440 790" font-family="Malgun Gothic, 맑은 고딕, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+  <title>3. 제안사업의 목표 요약</title>
+  <rect width="1440" height="790" fill="#ffffff"/>
+
+  <!-- ==================== CARD 1 : 기록 ==================== -->
+  <rect x="24" y="16" width="450" height="540" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="82" cy="72" r="26" fill="#1F3864"/>
+  <text x="82" y="81" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="122" y="66" font-size="28" font-weight="bold" fill="#1F3864">기록</text>
+  <text x="122" y="92" font-size="15" fill="#5A6472">이중입력 해소</text>
+
+  <!-- 일러스트 : 말하는 돌봄인력 + 음성 말풍선 -->
+  <path d="M157 206 a30 26 0 0 1 60 0 z" fill="#1F3864"/>
+  <rect x="181" y="176" width="12" height="10" fill="#FBDCC4"/>
+  <circle cx="187" cy="156" r="23" fill="#FBDCC4"/>
+  <ellipse cx="187" cy="138" rx="23.5" ry="13" fill="#3D4A5C"/>
+  <circle cx="172" cy="164" r="3.6" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="202" cy="164" r="3.6" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="179" cy="156" r="2.5" fill="#33404F"/>
+  <circle cx="195" cy="156" r="2.5" fill="#33404F"/>
+  <ellipse cx="187" cy="168" rx="6.5" ry="4.5" fill="#E06A6A"/>
+  <path d="M236 156 L222 166 L236 172 Z" fill="#DCE7F5"/>
+  <rect x="234" y="132" width="100" height="48" rx="14" fill="#DCE7F5"/>
+  <g stroke="#1F3864" stroke-width="3.4" stroke-linecap="round">
+    <path d="M258 151 v10"/><path d="M268 146 v20"/><path d="M278 141 v30"/>
+    <path d="M288 145 v22"/><path d="M298 149 v14"/><path d="M308 152 v8"/>
+  </g>
+  <text x="249" y="228" font-size="13.5" fill="#5A6472" text-anchor="middle">말하면 기록이 됩니다</text>
+
+  <rect x="44" y="244" width="410" height="116" rx="10" fill="#F2F4F7" stroke="#DCE1E9"/>
+  <text x="68" y="272" font-size="14" font-weight="bold" fill="#8A94A6">현재 (As-Is)</text>
+  <text x="68" y="308" font-size="20" fill="#333333">메모 후 시스템 재입력</text>
+  <text x="68" y="338" font-size="15" fill="#5A6472">수첩 → 기관 시스템 이중 작업</text>
+
+  <path d="M238 372 L260 372 L249 390 Z" fill="#1F3864"/>
+
+  <rect x="44" y="402" width="410" height="134" rx="10" fill="#EAF0FA" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="68" y="430" font-size="14" font-weight="bold" fill="#1F3864">목표 (To-Be)</text>
+  <text x="68" y="468" font-size="22" font-weight="bold" fill="#1A1A1A">30초 구술 →</text>
+  <text x="68" y="500" font-size="22" font-weight="bold" fill="#1A1A1A">기록 초안 자동 생성</text>
+  <text x="68" y="528" font-size="15" fill="#3D5A8A">복사·붙여넣기로 기존 서식에 입력</text>
+
+  <!-- ==================== CARD 2 : 연계 ==================== -->
+  <rect x="494" y="16" width="450" height="540" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="552" cy="72" r="26" fill="#17823F"/>
+  <text x="552" y="81" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="592" y="66" font-size="28" font-weight="bold" fill="#17823F">연계</text>
+  <text x="592" y="92" font-size="15" fill="#5A6472">돌봄 맥락 연결</text>
+
+  <!-- 일러스트 : 기관 ↔ 어르신 ↔ 기관 인수인계 -->
+  <path d="M626 138 Q719 112 812 138" fill="none" stroke="#17823F" stroke-width="2.6" stroke-dasharray="6 5"/>
+  <path d="M812 138 L800 131 L802 143 Z" fill="#17823F"/>
+  <g stroke="#B9C6D8" stroke-width="2" stroke-dasharray="5 4">
+    <path d="M636 176 L688 180"/><path d="M802 176 L750 180"/>
+  </g>
+  <!-- 어르신 (중앙) -->
+  <path d="M685 210 a34 28 0 0 1 68 0 z" fill="#7B8CA6"/>
+  <rect x="713" y="186" width="12" height="10" fill="#FBDCC4"/>
+  <circle cx="719" cy="164" r="25" fill="#FBDCC4"/>
+  <ellipse cx="719" cy="145" rx="25.5" ry="13" fill="#C7CDD6"/>
+  <circle cx="700" cy="172" r="4" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="738" cy="172" r="4" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="710" cy="165" r="2.5" fill="#33404F"/>
+  <circle cx="728" cy="165" r="2.5" fill="#33404F"/>
+  <path d="M710 176 q9 7 18 0" fill="none" stroke="#E06A6A" stroke-width="3" stroke-linecap="round"/>
+  <!-- 기관 A -->
+  <path d="M591 190 a22 18 0 0 1 44 0 z" fill="#1F3864"/>
+  <rect x="608" y="172" width="10" height="8" fill="#FBDCC4"/>
+  <circle cx="613" cy="156" r="17" fill="#FBDCC4"/>
+  <ellipse cx="613" cy="141" rx="17.5" ry="9.5" fill="#3D4A5C"/>
+  <circle cx="607" cy="156" r="2" fill="#33404F"/>
+  <circle cx="619" cy="156" r="2" fill="#33404F"/>
+  <ellipse cx="613" cy="165" rx="4.5" ry="3" fill="#E06A6A"/>
+  <!-- 기관 B -->
+  <path d="M802 190 a22 18 0 0 1 44 0 z" fill="#17823F"/>
+  <rect x="819" y="172" width="10" height="8" fill="#FBDCC4"/>
+  <circle cx="824" cy="156" r="17" fill="#FBDCC4"/>
+  <ellipse cx="824" cy="141" rx="17.5" ry="9.5" fill="#3D4A5C"/>
+  <circle cx="818" cy="156" r="2" fill="#33404F"/>
+  <circle cx="830" cy="156" r="2" fill="#33404F"/>
+  <ellipse cx="824" cy="165" rx="4.5" ry="3" fill="#E06A6A"/>
+  <text x="719" y="228" font-size="13.5" fill="#5A6472" text-anchor="middle">한 어르신을 여러 기관이 함께</text>
+
+  <rect x="514" y="244" width="410" height="116" rx="10" fill="#F2F4F7" stroke="#DCE1E9"/>
+  <text x="538" y="272" font-size="14" font-weight="bold" fill="#8A94A6">현재 (As-Is)</text>
+  <text x="538" y="308" font-size="20" fill="#333333">기관별 기록 단절</text>
+  <text x="538" y="338" font-size="15" fill="#5A6472">담당자 교체 시 돌봄 맥락 소실</text>
+
+  <path d="M708 372 L730 372 L719 390 Z" fill="#17823F"/>
+
+  <rect x="514" y="402" width="410" height="134" rx="10" fill="#E8F5EC" stroke="#17823F" stroke-width="1.5"/>
+  <text x="538" y="430" font-size="14" font-weight="bold" fill="#17823F">목표 (To-Be)</text>
+  <text x="538" y="468" font-size="22" font-weight="bold" fill="#1A1A1A">대상자별 통합</text>
+  <text x="538" y="500" font-size="22" font-weight="bold" fill="#1A1A1A">인수인계 브리핑</text>
+  <text x="538" y="528" font-size="15" fill="#166B37">기관 연계·사례회의에 바로 활용</text>
+
+  <!-- ==================== CARD 3 : 안전 ==================== -->
+  <rect x="964" y="16" width="450" height="540" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="1022" cy="72" r="26" fill="#5B2C8D"/>
+  <text x="1022" y="81" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="1062" y="66" font-size="28" font-weight="bold" fill="#5B2C8D">안전</text>
+  <text x="1062" y="92" font-size="15" fill="#5A6472">위험 조기 발견</text>
+
+  <!-- 일러스트 : 어르신 + 이상징후 알림 + 하트를 감싼 손 -->
+  <path d="M1109 210 a34 28 0 0 1 68 0 z" fill="#7B8CA6"/>
+  <rect x="1137" y="186" width="12" height="10" fill="#FBDCC4"/>
+  <circle cx="1143" cy="164" r="25" fill="#FBDCC4"/>
+  <ellipse cx="1143" cy="145" rx="25.5" ry="13" fill="#C7CDD6"/>
+  <circle cx="1124" cy="172" r="4" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="1162" cy="172" r="4" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="1134" cy="165" r="2.5" fill="#33404F"/>
+  <circle cx="1152" cy="165" r="2.5" fill="#33404F"/>
+  <path d="M1134 176 q9 7 18 0" fill="none" stroke="#E06A6A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="1174" cy="136" r="17.5" fill="#ffffff"/>
+  <circle cx="1174" cy="136" r="15" fill="#ED7D31"/>
+  <text x="1174" y="143" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="middle">!</text>
+  <path d="M1240 194 C1214 176 1208 156 1221 147 C1231 140 1240 148 1240 155 C1240 148 1249 140 1259 147 C1272 156 1266 176 1240 194 Z" fill="#E4756B"/>
+  <circle cx="1240" cy="160" r="6.5" fill="#ffffff"/>
+  <path d="M1229 178 a11 9 0 0 1 22 0 z" fill="#ffffff"/>
+  <text x="1189" y="228" font-size="13.5" fill="#5A6472" text-anchor="middle">위험 신호를 먼저 알려드립니다</text>
+
+  <rect x="984" y="244" width="410" height="116" rx="10" fill="#F2F4F7" stroke="#DCE1E9"/>
+  <text x="1008" y="272" font-size="14" font-weight="bold" fill="#8A94A6">현재 (As-Is)</text>
+  <text x="1008" y="308" font-size="20" fill="#333333">개인의 판단에 의존</text>
+  <text x="1008" y="338" font-size="15" fill="#5A6472">기록에 남아도 놓치기 쉬움</text>
+
+  <path d="M1178 372 L1200 372 L1189 390 Z" fill="#5B2C8D"/>
+
+  <rect x="984" y="402" width="410" height="134" rx="10" fill="#F1EAF9" stroke="#5B2C8D" stroke-width="1.5"/>
+  <text x="1008" y="430" font-size="14" font-weight="bold" fill="#5B2C8D">목표 (To-Be)</text>
+  <text x="1008" y="468" font-size="22" font-weight="bold" fill="#1A1A1A">AI가 위험신호 표시</text>
+  <text x="1008" y="500" font-size="22" font-weight="bold" fill="#1A1A1A">+ 알림 초안 제시</text>
+  <text x="1008" y="528" font-size="15" fill="#5B2C8D">‘판정’이 아닌 ‘확인 필요 신호’</text>
+
+  <!-- ==================== 정량목표 KPI ==================== -->
+  <rect x="24" y="574" width="1392" height="112" rx="12" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <g stroke="#DCE4F0" stroke-width="1">
+    <path d="M256 604 V670"/><path d="M488 604 V670"/><path d="M720 604 V670"/>
+    <path d="M952 604 V670"/><path d="M1184 604 V670"/>
+  </g>
+  <rect x="48" y="560" width="132" height="30" rx="15" fill="#1F3864"/>
+  <text x="114" y="581" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">정량목표</text>
+  <g text-anchor="middle">
+    <text x="140" y="642" font-size="30" font-weight="bold" fill="#ED7D31">50%↓</text>
+    <text x="140" y="669" font-size="15" fill="#5A6472">기록 작성시간 단축</text>
+    <text x="372" y="642" font-size="30" font-weight="bold" fill="#1F3864">5~10명</text>
+    <text x="372" y="669" font-size="15" fill="#5A6472">파일럿 참여 인력</text>
+    <text x="604" y="642" font-size="30" font-weight="bold" fill="#1F3864">2주</text>
+    <text x="604" y="669" font-size="15" fill="#5A6472">현장 실사용 기간</text>
+    <text x="836" y="642" font-size="30" font-weight="bold" fill="#1F3864">200건+</text>
+    <text x="836" y="669" font-size="15" fill="#5A6472">누적 기록 생성</text>
+    <text x="1068" y="642" font-size="30" font-weight="bold" fill="#1F3864">80%+</text>
+    <text x="1068" y="669" font-size="15" fill="#5A6472">AI 초안 수용률</text>
+    <text x="1300" y="642" font-size="30" font-weight="bold" fill="#1F3864">20명+</text>
+    <text x="1300" y="669" font-size="15" fill="#5A6472">사전 수요조사</text>
+  </g>
+
+  <!-- ==================== 정성목표 FOOTER ==================== -->
+  <rect x="24" y="702" width="1392" height="58" rx="10" fill="#1F3864"/>
+  <circle cx="64" cy="731" r="16" fill="#ffffff"/>
+  <path d="M64 740 C56 733 53 727 57 723 C60 720 64 723 64 726 C64 723 68 720 71 723 C75 727 72 733 64 740 Z" fill="#E4756B"/>
+  <text x="762" y="739" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="middle">정성목표 — 행정 부담을 줄여 <tspan fill="#FFC24D">돌봄시간을 확대</tspan>하고, 전국 통합돌봄에 적용 가능한 <tspan fill="#FFC24D">AI 기록·연계 도구의 원형</tspan>을 제시합니다.</text>
+</svg>

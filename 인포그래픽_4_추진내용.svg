@@ -1,0 +1,231 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="930" viewBox="0 0 1440 930" font-family="Malgun Gothic, 맑은 고딕, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+  <title>4. 추진내용 전체 흐름</title>
+  <rect width="1440" height="930" fill="#ffffff"/>
+
+  <!-- ==================== 처리 흐름 ==================== -->
+  <rect x="24" y="16" width="1392" height="112" rx="12" fill="#EEF3FA" stroke="#C9D6EA" stroke-width="1.5"/>
+
+  <rect x="60" y="40" width="300" height="64" rx="32" fill="#ffffff" stroke="#1F3864" stroke-width="2"/>
+  <circle cx="94" cy="72" r="15" fill="#FBDCC4"/>
+  <ellipse cx="94" cy="59" rx="15.5" ry="8" fill="#3D4A5C"/>
+  <circle cx="89" cy="72" r="1.8" fill="#33404F"/>
+  <circle cx="99" cy="72" r="1.8" fill="#33404F"/>
+  <ellipse cx="94" cy="80" rx="4.5" ry="3.2" fill="#E06A6A"/>
+  <text x="118" y="79" font-size="18" font-weight="bold" fill="#1F3864">방문 직후 30초 구술</text>
+  <path d="M372 64 L390 72 L372 80 Z" fill="#1F3864"/>
+
+  <rect x="400" y="40" width="300" height="64" rx="32" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <g stroke="#1F3864" stroke-width="3" stroke-linecap="round">
+    <path d="M428 67 v10"/><path d="M436 62 v20"/><path d="M444 58 v28"/>
+    <path d="M452 63 v18"/><path d="M460 67 v10"/>
+  </g>
+  <text x="478" y="79" font-size="18" font-weight="bold" fill="#1A1A1A">한국어 STT</text>
+  <path d="M712 64 L730 72 L712 80 Z" fill="#1F3864"/>
+
+  <rect x="740" y="40" width="300" height="64" rx="32" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <path d="M772 58 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 Z" fill="#1F3864"/>
+  <text x="800" y="79" font-size="18" font-weight="bold" fill="#1A1A1A">생성형 AI 구조화</text>
+  <path d="M1052 64 L1070 72 L1052 80 Z" fill="#1F3864"/>
+
+  <rect x="1080" y="40" width="300" height="64" rx="32" fill="#1F3864"/>
+  <rect x="1102" y="60" width="14" height="20" rx="2" fill="#ffffff" opacity="0.5"/>
+  <rect x="1106" y="58" width="14" height="20" rx="2" fill="#ffffff" opacity="0.75"/>
+  <rect x="1110" y="56" width="14" height="20" rx="2" fill="#ffffff"/>
+  <text x="1136" y="79" font-size="18" font-weight="bold" fill="#ffffff">규격 산출물 3종</text>
+
+  <!-- ==================== 기능 ① ==================== -->
+  <rect x="24" y="148" width="450" height="360" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="82" cy="198" r="25" fill="#1F3864"/>
+  <text x="82" y="207" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="120" y="193" font-size="21" font-weight="bold" fill="#1F3864">규격 돌봄기록 초안</text>
+  <text x="120" y="218" font-size="14" fill="#5A6472">음성 → 규격 기록</text>
+
+  <!-- 일러스트 : 말하는 돌봄인력 → 규격 기록 문서 -->
+  <path d="M172 312 a28 24 0 0 1 56 0 z" fill="#1F3864"/>
+  <rect x="194" y="284" width="12" height="10" fill="#FBDCC4"/>
+  <circle cx="200" cy="266" r="21" fill="#FBDCC4"/>
+  <ellipse cx="200" cy="249" rx="21.5" ry="12" fill="#3D4A5C"/>
+  <circle cx="186" cy="273" r="3.3" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="214" cy="273" r="3.3" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="193" cy="266" r="2.3" fill="#33404F"/>
+  <circle cx="207" cy="266" r="2.3" fill="#33404F"/>
+  <ellipse cx="200" cy="277" rx="6" ry="4.2" fill="#E06A6A"/>
+  <path d="M240 268 L256 275 L240 282 Z" fill="#1F3864"/>
+  <rect x="266" y="240" width="56" height="66" rx="5" fill="#ffffff" stroke="#1F3864" stroke-width="2.4"/>
+  <g stroke="#1F3864" stroke-width="2.4" stroke-linecap="round">
+    <path d="M276 262 h36"/><path d="M276 272 h36"/><path d="M276 282 h24"/>
+  </g>
+  <circle cx="318" cy="298" r="11" fill="#17823F"/>
+  <path d="M313 298 l4 4 7 -8" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g font-size="15.5" fill="#333333">
+    <text x="58" y="344">· 30초 구술 → STT → 생성형 AI</text>
+    <text x="58" y="366">· 「노인맞춤돌봄서비스 사업안내」</text>
+    <text x="72" y="388">기록 항목에 맞춰 구조화</text>
+    <text x="58" y="410">· 복사·붙여넣기 가능한 규격 텍스트</text>
+  </g>
+  <rect x="44" y="428" width="410" height="60" rx="10" fill="#EAF0FA" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="68" y="452" font-size="15.5" font-weight="bold" fill="#1F3864">→ 기존 기록 시스템 대체 없이</text>
+  <text x="90" y="474" font-size="15.5" font-weight="bold" fill="#1F3864">이중입력 부담 감소</text>
+
+  <!-- ==================== 기능 ② ==================== -->
+  <rect x="494" y="148" width="450" height="360" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="552" cy="198" r="25" fill="#17823F"/>
+  <text x="552" y="207" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="590" y="193" font-size="21" font-weight="bold" fill="#17823F">기관 간 인수인계 브리핑</text>
+  <text x="590" y="218" font-size="14" fill="#5A6472">기록 → 돌봄 맥락</text>
+
+  <!-- 일러스트 : 담당자 A → 대상자별 브리핑 → 담당자 B -->
+  <path d="M620 312 a24 21 0 0 1 48 0 z" fill="#1F3864"/>
+  <rect x="638" y="288" width="10" height="9" fill="#FBDCC4"/>
+  <circle cx="643" cy="272" r="18" fill="#FBDCC4"/>
+  <ellipse cx="643" cy="257" rx="18.5" ry="10" fill="#3D4A5C"/>
+  <circle cx="631" cy="278" r="2.8" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="655" cy="278" r="2.8" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="637" cy="272" r="2" fill="#33404F"/>
+  <circle cx="649" cy="272" r="2" fill="#33404F"/>
+  <ellipse cx="643" cy="282" rx="5" ry="3.4" fill="#E06A6A"/>
+  <path d="M672 272 L686 279 L672 286 Z" fill="#17823F"/>
+  <rect x="692" y="244" width="54" height="60" rx="6" fill="#E8F5EC" stroke="#17823F" stroke-width="2"/>
+  <circle cx="719" cy="259" r="9" fill="#FBDCC4"/>
+  <ellipse cx="719" cy="251" rx="9.5" ry="5" fill="#C7CDD6"/>
+  <circle cx="716" cy="260" r="1.1" fill="#33404F"/>
+  <circle cx="722" cy="260" r="1.1" fill="#33404F"/>
+  <path d="M715.5 264 q3.5 2.5 7 0" fill="none" stroke="#E06A6A" stroke-width="1.5" stroke-linecap="round"/>
+  <g stroke="#17823F" stroke-width="2.2" stroke-linecap="round">
+    <path d="M701 279 h36"/><path d="M701 289 h26"/>
+  </g>
+  <path d="M752 272 L766 279 L752 286 Z" fill="#17823F"/>
+  <path d="M771 312 a24 21 0 0 1 48 0 z" fill="#17823F"/>
+  <rect x="789" y="288" width="10" height="9" fill="#FBDCC4"/>
+  <circle cx="794" cy="272" r="18" fill="#FBDCC4"/>
+  <ellipse cx="794" cy="257" rx="18.5" ry="10" fill="#3D4A5C"/>
+  <circle cx="782" cy="278" r="2.8" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="806" cy="278" r="2.8" fill="#F6B9A6" opacity="0.7"/>
+  <circle cx="788" cy="272" r="2" fill="#33404F"/>
+  <circle cx="800" cy="272" r="2" fill="#33404F"/>
+  <ellipse cx="794" cy="282" rx="5" ry="3.4" fill="#E06A6A"/>
+
+  <g font-size="15.5" fill="#333333">
+    <text x="528" y="344">· 동일 대상자의 기관별 기록을</text>
+    <text x="542" y="366">시간순으로 통합·요약</text>
+    <text x="528" y="388">· “지난 2주간 이 어르신에게</text>
+    <text x="542" y="410">무슨 일이 있었는가?” 한눈에</text>
+  </g>
+  <rect x="514" y="428" width="410" height="60" rx="10" fill="#E8F5EC" stroke="#17823F" stroke-width="1.5"/>
+  <text x="538" y="452" font-size="15.5" font-weight="bold" fill="#17823F">→ 담당자 교체·기관 연계 시</text>
+  <text x="560" y="474" font-size="15.5" font-weight="bold" fill="#17823F">돌봄 맥락 소실 최소화</text>
+
+  <!-- ==================== 기능 ③ ==================== -->
+  <rect x="964" y="148" width="450" height="360" rx="14" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <circle cx="1022" cy="198" r="25" fill="#5B2C8D"/>
+  <text x="1022" y="207" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="1060" y="193" font-size="21" font-weight="bold" fill="#5B2C8D">이상징후 플래깅·알림</text>
+  <text x="1060" y="218" font-size="14" fill="#5A6472">기록 → 확인 필요 신호</text>
+
+  <!-- 일러스트 : 어르신 + 이상징후 배지 + 연계 알림 -->
+  <path d="M1104 312 a30 26 0 0 1 60 0 z" fill="#7B8CA6"/>
+  <rect x="1128" y="286" width="12" height="10" fill="#FBDCC4"/>
+  <circle cx="1134" cy="268" r="22" fill="#FBDCC4"/>
+  <ellipse cx="1134" cy="251" rx="22.5" ry="12" fill="#C7CDD6"/>
+  <circle cx="1119" cy="275" r="3.5" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="1149" cy="275" r="3.5" fill="#F6B9A6" opacity="0.65"/>
+  <circle cx="1127" cy="269" r="2.3" fill="#33404F"/>
+  <circle cx="1141" cy="269" r="2.3" fill="#33404F"/>
+  <path d="M1127 279 q7 5.5 14 0" fill="none" stroke="#E06A6A" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="1160" cy="244" r="15" fill="#ffffff"/>
+  <circle cx="1160" cy="244" r="13" fill="#ED7D31"/>
+  <text x="1160" y="251" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">!</text>
+  <path d="M1198 274 L1186 283 L1198 289 Z" fill="#EDE2F7"/>
+  <rect x="1196" y="252" width="78" height="46" rx="12" fill="#EDE2F7"/>
+  <path d="M1214 282 Q1214 262 1224 260 Q1234 262 1234 282 Z" fill="#5B2C8D"/>
+  <path d="M1210 282 h28" stroke="#5B2C8D" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="1224" cy="287" r="3" fill="#5B2C8D"/>
+  <circle cx="1224" cy="258" r="2.6" fill="#5B2C8D"/>
+  <g fill="none" stroke="#ED7D31" stroke-width="2.2" stroke-linecap="round">
+    <path d="M1242 268 q5 7 0 14"/><path d="M1250 263 q8 11 0 24"/>
+  </g>
+
+  <g font-size="15.5" fill="#333333">
+    <text x="998" y="344">· 약 미복용·식사량 감소·낙상·</text>
+    <text x="1012" y="366">정서적 위축·방문 거부 탐지</text>
+    <text x="998" y="388">· 담당자·연계기관 전달용</text>
+    <text x="1012" y="410">알림 문안 초안 자동 제시</text>
+  </g>
+  <rect x="984" y="428" width="410" height="60" rx="10" fill="#F1EAF9" stroke="#5B2C8D" stroke-width="1.5"/>
+  <text x="1008" y="452" font-size="15.5" font-weight="bold" fill="#5B2C8D">→ AI는 ‘판정’이 아닌</text>
+  <text x="1030" y="474" font-size="15.5" font-weight="bold" fill="#5B2C8D">‘확인이 필요한 신호’만 제시</text>
+
+  <!-- ==================== 기술구현 ==================== -->
+  <rect x="24" y="528" width="1392" height="92" rx="12" fill="#ffffff" stroke="#C9D6EA" stroke-width="1.5"/>
+  <g stroke="#DCE4F0" stroke-width="1">
+    <path d="M372 552 V608"/><path d="M720 552 V608"/><path d="M1068 552 V608"/>
+  </g>
+  <rect x="48" y="514" width="132" height="30" rx="15" fill="#1F3864"/>
+  <text x="114" y="535" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">기술구현</text>
+  <g text-anchor="middle">
+    <text x="198" y="579" font-size="18" font-weight="bold" fill="#1F3864">모바일 웹</text>
+    <text x="198" y="604" font-size="14.5" fill="#5A6472">앱 설치 없이 브라우저 즉시 사용</text>
+    <text x="546" y="579" font-size="18" font-weight="bold" fill="#1F3864">한국어 STT</text>
+    <text x="546" y="604" font-size="14.5" fill="#5A6472">인력 본인 구술 입력 · 오류 최소화</text>
+    <text x="894" y="579" font-size="18" font-weight="bold" fill="#1F3864">생성형 AI</text>
+    <text x="894" y="604" font-size="14.5" fill="#5A6472">구조화 · 요약 · 위험신호 분류</text>
+    <text x="1242" y="579" font-size="18" font-weight="bold" fill="#1F3864">개인정보 보호</text>
+    <text x="1242" y="604" font-size="14.5" fill="#5A6472">음성 원본 · 식별정보 미저장</text>
+  </g>
+
+  <!-- ==================== 현장검증 ==================== -->
+  <rect x="24" y="640" width="1392" height="180" rx="12" fill="#EEF3FA" stroke="#C9D6EA" stroke-width="1.5"/>
+  <rect x="48" y="626" width="132" height="30" rx="15" fill="#1F3864"/>
+  <text x="114" y="647" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">현장검증</text>
+
+  <rect x="60" y="672" width="400" height="128" rx="10" fill="#ffffff" stroke="#C9D6EA"/>
+  <text x="84" y="703" font-size="19" font-weight="bold" fill="#1F3864"><tspan font-size="14" fill="#8A94A6">01  </tspan>현행 업무분석</text>
+  <rect x="416" y="688" width="20" height="26" rx="3" fill="#ffffff" stroke="#1F3864" stroke-width="2"/>
+  <g stroke="#1F3864" stroke-width="1.8" stroke-linecap="round">
+    <path d="M421 696 h10"/><path d="M421 702 h10"/><path d="M421 708 h6"/>
+  </g>
+  <g font-size="14.5" fill="#333333">
+    <text x="84" y="734">· 보건복지부 「2026년 노인맞춤돌봄</text>
+    <text x="94" y="756">서비스 사업안내」 기록 항목 분석</text>
+    <text x="84" y="780">· 「광주다움 통합돌봄 우수사례집」 분석</text>
+  </g>
+  <path d="M482 728 L500 736 L482 744 Z" fill="#1F3864"/>
+
+  <rect x="520" y="672" width="400" height="128" rx="10" fill="#ffffff" stroke="#C9D6EA"/>
+  <text x="544" y="703" font-size="19" font-weight="bold" fill="#1F3864"><tspan font-size="14" fill="#8A94A6">02  </tspan>사전 수요조사</text>
+  <circle cx="886" cy="700" r="15" fill="#FBDCC4"/>
+  <ellipse cx="886" cy="687" rx="15.5" ry="8" fill="#3D4A5C"/>
+  <circle cx="881" cy="700" r="1.7" fill="#33404F"/>
+  <circle cx="891" cy="700" r="1.7" fill="#33404F"/>
+  <ellipse cx="886" cy="708" rx="4.2" ry="3" fill="#E06A6A"/>
+  <g font-size="14.5" fill="#333333">
+    <text x="544" y="734">· 돌봄인력 <tspan font-weight="bold" fill="#1F3864">20명 이상</tspan> 대상</text>
+    <text x="554" y="756">기록 작성 실태·요구사항 조사</text>
+    <text x="544" y="780">· 기능 우선순위 및 서비스 설계 반영</text>
+  </g>
+  <path d="M942 728 L960 736 L942 744 Z" fill="#1F3864"/>
+
+  <rect x="980" y="672" width="400" height="128" rx="10" fill="#ffffff" stroke="#ED7D31" stroke-width="1.5"/>
+  <text x="1004" y="703" font-size="19" font-weight="bold" fill="#1F3864"><tspan font-size="14" fill="#8A94A6">03  </tspan>현장 파일럿</text>
+  <circle cx="1346" cy="700" r="15" fill="#FBDCC4"/>
+  <ellipse cx="1346" cy="687" rx="15.5" ry="8" fill="#C7CDD6"/>
+  <circle cx="1341" cy="700" r="1.7" fill="#33404F"/>
+  <circle cx="1351" cy="700" r="1.7" fill="#33404F"/>
+  <path d="M1341 707 q5 4 10 0" fill="none" stroke="#E06A6A" stroke-width="2" stroke-linecap="round"/>
+  <text x="1004" y="734" font-size="14.5" fill="#333333">· 노인복지관·수행기관 등 협력기관 확보</text>
+  <g text-anchor="middle">
+    <text x="1047" y="773" font-size="22" font-weight="bold" fill="#ED7D31">5~10명</text>
+    <text x="1047" y="791" font-size="12.5" fill="#5A6472">참여 인력</text>
+    <text x="1180" y="773" font-size="22" font-weight="bold" fill="#ED7D31">2주</text>
+    <text x="1180" y="791" font-size="12.5" fill="#5A6472">실사용 기간</text>
+    <text x="1313" y="773" font-size="22" font-weight="bold" fill="#ED7D31">200건</text>
+    <text x="1313" y="791" font-size="12.5" fill="#5A6472">누적 기록</text>
+  </g>
+
+  <!-- ==================== FOOTER ==================== -->
+  <rect x="24" y="838" width="1392" height="58" rx="10" fill="#1F3864"/>
+  <circle cx="64" cy="867" r="16" fill="#ffffff"/>
+  <text x="64" y="875" font-size="21" font-weight="bold" fill="#1F3864" text-anchor="middle">!</text>
+  <text x="762" y="875" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="middle">AI 결과는 모두 <tspan fill="#FFC24D">‘초안’</tspan> — 현장인력이 확인·수정 후 사용하며, AI는 위험을 최종 판정하지 않습니다.</text>
+</svg>
