@@ -8,7 +8,7 @@
 - `doc/plans/`: 단계별 실행 계획
 
 ## 현재 단계
-4단계(마이크 스모크 테스트) 구현 완료, 실기기 테스트 대기(https://dolbomieum.kr/mic-test) → 다음은 5단계(DB·RLS·로그인). 단계가 바뀔 때마다 이 줄을 갱신한다.
+4단계(마이크 스모크 테스트) 완료 → 5단계(DB·RLS·로그인) 진행 중. 운영 주소 https://dolbomieum.kr. 단계가 바뀔 때마다 이 줄을 갱신한다.
 
 ## 작업 방식
 - superpowers 흐름만 쓴다: 단계 시작 전 계획(writing-plans) → 실행 → 실제 실행 결과로 검증한 뒤 완료 보고. bkit·SuperClaude는 쓰지 않는다.
