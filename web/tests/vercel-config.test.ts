@@ -10,4 +10,9 @@ describe("vercel.json", () => {
     expect(existsSync(file)).toBe(true);
     expect(JSON.parse(readFileSync(file, "utf8")).regions).toEqual(["icn1"]);
   });
+
+  // 무료 Supabase는 7일 동안 사용이 적으면 일시정지된다. Hobby 크론은 하루 한 번까지만 된다.
+  it("하루 한 번 DB 깨우기 크론을 부른다", () => {
+    expect(JSON.parse(readFileSync(file, "utf8")).crons).toEqual([{ path: "/api/cron/keepalive", schedule: "0 0 * * *" }]);
+  });
 });

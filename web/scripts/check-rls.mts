@@ -48,6 +48,9 @@ const anonClients = await anon.from("clients").select("code");
 check("비로그인은 대상자를 볼 수 없다", (anonClients.data ?? []).length === 0, anonClients.error?.code ?? "0건");
 const signup = await anon.auth.signUp({ email: `probe-${Date.now()}@dolbomieum.kr`, password: "Probe-password-12345" });
 check("공개 가입이 막혀 있다", Boolean(signup.error), signup.error?.message ?? "가입이 됐음");
+// 무료 프로젝트 일시정지 방지용 깨우기 함수는 비로그인(크론)도 부를 수 있다. 시각만 돌려준다
+const ping = await anon.rpc("keepalive");
+check("비로그인은 깨우기 함수(keepalive)를 부를 수 있다", !ping.error && typeof ping.data === "string", ping.error?.code ?? "");
 
 // 2) 기관별 계정: 내 기관과 연결된 대상자만 보인다
 const workerA = await signIn("WORKER_A");
