@@ -131,13 +131,3 @@ export const DEMO_ALERTS: Record<string, DemoAlert> = {
 export function getDemoAlert(clientId: string): DemoAlert | undefined {
   return Object.hasOwn(DEMO_ALERTS, clientId) ? DEMO_ALERTS[clientId] : undefined;
 }
-
-export const DEMO_TODAY = "10월 14일 (수)";
-
-export type DemoVisit = { client: ClientDisplay; time: string; done: boolean; note?: string };
-
-export const DEMO_VISITS: DemoVisit[] = [
-  { client: C0012, time: "09:30", done: true, note: "지난 방문: 식사량 감소 관찰" },
-  { client: C0081, time: "11:00", done: false, note: "지난 방문: 정서적 위축 관찰" },
-  { client: C0095, time: "14:00", done: false },
-];

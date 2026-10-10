@@ -24,13 +24,21 @@ type Session = {
  * 휴대폰 마이크 녹음. 결과는 브라우저 메모리(Blob URL)에만 두고 저장·전송하지 않는다.
  * 녹음 중에는 화면 꺼짐을 막고, 끝나면 마이크와 화면 꺼짐 방지를 모두 해제한다.
  */
-export function useRecorder(maxMs = MAX_RECORDING_MS) {
+export function useRecorder(
+  maxMs = MAX_RECORDING_MS,
+  /** 녹음이 끝나면 호출 (예: 바로 글자 변환). 렌더마다 바뀌어도 최신 함수를 쓴다. */
+  onComplete?: (recording: Recording, blob: Blob) => void,
+) {
   const [status, setStatus] = useState<RecorderStatus>("idle");
   const [recording, setRecording] = useState<Recording | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [errorName, setErrorName] = useState<string | null>(null);
   const session = useRef<Session | null>(null);
   const lastUrl = useRef<string | null>(null);
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const release = useCallback(() => {
     const s = session.current;
@@ -95,9 +103,11 @@ export function useRecorder(maxMs = MAX_RECORDING_MS) {
       if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
       const url = URL.createObjectURL(blob);
       lastUrl.current = url;
-      setRecording({ url, mimeType: type, size: blob.size, durationMs: Date.now() - s.startedAt, autoStopped: s.autoStopped });
+      const result = { url, mimeType: type, size: blob.size, durationMs: Date.now() - s.startedAt, autoStopped: s.autoStopped };
+      setRecording(result);
       setStatus("stopped");
       release();
+      onCompleteRef.current?.(result, blob);
     };
     recorder.onerror = () => {
       setErrorName("RecorderError");

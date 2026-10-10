@@ -1,0 +1,70 @@
+import { afterEach, describe, expect, it } from "vitest";
+import { DraftConfigError, DraftFailedError, DraftRefusedError, generateDraft, type DraftClient } from "@/lib/ai/draft";
+import { DRAFT_MODEL } from "@/lib/ai/models";
+import { DRAFT_FIXTURE } from "../fixtures/record-draft";
+
+type Reply = Awaited<ReturnType<DraftClient["messages"]["parse"]>>;
+
+function fakeClient(reply: Partial<Reply>) {
+  const calls: Parameters<DraftClient["messages"]["parse"]>[0][] = [];
+  const client: DraftClient = {
+    messages: {
+      parse: async (params) => {
+        calls.push(params);
+        return { stop_reason: "end_turn", stop_details: null, parsed_output: DRAFT_FIXTURE, model: DRAFT_MODEL, ...reply };
+      },
+    },
+  };
+  return { client, calls };
+}
+
+describe("generateDraft", () => {
+  const saved = process.env.ANTHROPIC_API_KEY;
+  afterEach(() => {
+    process.env.ANTHROPIC_API_KEY = saved;
+  });
+
+  it("정해진 모델·낮은 effort·캐시된 시스템 프롬프트로 요청하고 초안을 돌려준다", async () => {
+    const { client, calls } = fakeClient({});
+    const result = await generateDraft("어르신께서 고혈압약을 이틀째 안 드셨어요", client);
+    expect(result).toEqual({ draft: DRAFT_FIXTURE, model: DRAFT_MODEL });
+    const sent = calls[0];
+    expect(sent.model).toBe(DRAFT_MODEL);
+    expect(sent.output_config?.effort).toBe("low");
+    expect(JSON.stringify(sent.system)).toContain("ephemeral");
+    expect(JSON.stringify(sent.messages)).toContain("<구술>");
+  });
+
+  it("호출 전에 개인정보를 다시 가린다", async () => {
+    const { client, calls } = fakeClient({});
+    await generateDraft("김영희 어르신 010-1234-5678", client);
+    const sent = JSON.stringify(calls[0].messages);
+    expect(sent).toContain("[이름] 어르신 [전화번호]");
+    expect(sent).not.toContain("김영희");
+  });
+
+  it("거절(refusal)이면 분류와 함께 DraftRefusedError", async () => {
+    const { client } = fakeClient({ stop_reason: "refusal", stop_details: { category: "general_harms" }, parsed_output: null });
+    await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toMatchObject({
+      name: "DraftRefusedError",
+      category: "general_harms",
+    });
+  });
+
+  it("결과를 해석하지 못하면 DraftFailedError", async () => {
+    const empty = fakeClient({ stop_reason: "max_tokens", parsed_output: null });
+    await expect(generateDraft("어르신 방문 기록입니다", empty.client)).rejects.toBeInstanceOf(DraftFailedError);
+    const wrong = fakeClient({ parsed_output: { summary: 1 } });
+    await expect(generateDraft("어르신 방문 기록입니다", wrong.client)).rejects.toBeInstanceOf(DraftFailedError);
+  });
+
+  it("ANTHROPIC_API_KEY가 없으면 설정 오류", async () => {
+    delete process.env.ANTHROPIC_API_KEY;
+    await expect(generateDraft("어르신 방문 기록입니다")).rejects.toBeInstanceOf(DraftConfigError);
+  });
+
+  it("거절 오류는 DraftRefusedError 클래스다", async () => {
+    const { client } = fakeClient({ stop_reason: "refusal", stop_details: null, parsed_output: null });
+    await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toBeInstanceOf(DraftRefusedError);
+  });
+});
