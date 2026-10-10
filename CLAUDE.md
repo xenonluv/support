@@ -8,7 +8,7 @@
 - `doc/plans/`: 단계별 실행 계획
 
 ## 현재 단계
-4단계(마이크 스모크 테스트) 완료 → 5단계(DB·RLS·로그인) 진행 중. 운영 주소 https://dolbomieum.kr. 단계가 바뀔 때마다 이 줄을 갱신한다.
+5단계(DB·RLS·로그인) 완료 → 다음은 6단계(기능① 음성 → 기록 초안). 운영 주소 https://dolbomieum.kr. DB 관리: `npm run seed`, 권한 검증: `npm run test:rls`. 단계가 바뀔 때마다 이 줄을 갱신한다.
 
 ## 작업 방식
 - superpowers 흐름만 쓴다: 단계 시작 전 계획(writing-plans) → 실행 → 실제 실행 결과로 검증한 뒤 완료 보고. bkit·SuperClaude는 쓰지 않는다.
@@ -34,7 +34,7 @@
 - DB에 성명·주소·연락처 컬럼을 만들지 않는다. 대상자는 식별번호로만 관리한다.
 - LLM 호출 전에 반드시 `web/src/lib/privacy` 마스킹을 거친다.
 - 로그에 구술 텍스트나 초안 내용을 남기지 않는다.
-- API 키는 서버 환경변수에만 둔다. `NEXT_PUBLIC_` 접두사는 Supabase URL·anon key에만 쓴다.
+- API 키는 서버 환경변수에만 둔다. `NEXT_PUBLIC_` 접두사는 Supabase URL·publishable key에만 쓴다. 비밀 키(`SUPABASE_SECRET_KEY`)는 관리 스크립트에서만 쓴다.
 
 ## 비용
 - 무료 우선이다. 유료는 Claude API 하나뿐이다.

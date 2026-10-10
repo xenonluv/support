@@ -12,7 +12,9 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed": "node --env-file=.env.local scripts/seed.mts",
+    "test:rls": "node --env-file=.env.local scripts/check-rls.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

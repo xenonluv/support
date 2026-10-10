@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const transcribeMock = vi.fn();
+const authUserMock = vi.fn();
+vi.mock("@/lib/auth/session", () => ({ getAuthUserId: () => authUserMock() }));
 vi.mock("@/lib/stt", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/stt")>()),
   transcribe: (...args: unknown[]) => transcribeMock(...args),
@@ -22,6 +24,15 @@ describe("POST /api/transcribe", () => {
   // 중괄호로 감싼다: 함수를 반환하면 Vitest가 그 함수를 테스트 뒤 정리 함수로 실행한다
   beforeEach(() => {
     transcribeMock.mockReset();
+    authUserMock.mockReset();
+    authUserMock.mockResolvedValue("user-1");
+  });
+
+  it("로그인하지 않았으면 401, 변환을 호출하지 않는다", async () => {
+    authUserMock.mockResolvedValue(null);
+    const res = await POST(request({ file: audio }));
+    expect(res.status).toBe(401);
+    expect(transcribeMock).not.toHaveBeenCalled();
   });
 
   it("변환한 글자와 엔진 이름을 돌려준다", async () => {

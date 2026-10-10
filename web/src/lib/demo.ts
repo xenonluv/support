@@ -12,11 +12,6 @@ const C0063: ClientDisplay = { code: "C-0063", ageBand: 80, dong: "서구 농성
 const C0081: ClientDisplay = { code: "C-0081", ageBand: 70, dong: "서구 화정1동" };
 const C0095: ClientDisplay = { code: "C-0095", ageBand: 70, dong: "서구 농성2동" };
 
-export const DEMO_MANAGER = {
-  displayName: "데모 담당자",
-  affiliation: "화정1동 행정복지센터 · 통합돌봄 담당",
-};
-
 export const DEMO_SUMMARY = {
   totalClients: 128,
   priorityCount: 3,
@@ -136,8 +131,6 @@ export const DEMO_ALERTS: Record<string, DemoAlert> = {
 export function getDemoAlert(clientId: string): DemoAlert | undefined {
   return Object.hasOwn(DEMO_ALERTS, clientId) ? DEMO_ALERTS[clientId] : undefined;
 }
-
-export const DEMO_WORKER = { displayName: "데모 생활지원사" };
 
 export const DEMO_TODAY = "10월 14일 (수)";
 

@@ -32,6 +32,7 @@ const IDLE_STT: SttState = { status: "idle", text: "", ms: null, error: null };
 
 const STT_ERROR_LABEL: Record<string, string> = {
   forbidden: "허용되지 않은 요청이에요",
+  unauthorized: "로그인이 필요해요",
   "too-large": "녹음이 너무 길어요(4MB 초과)",
   "not-configured": "서버에 Groq 키가 설정되지 않았어요",
   "stt-failed": "Groq 변환에 실패했어요",

@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@/lib/auth/session";
 import { SttConfigError, transcribe } from "@/lib/stt";
 import { checkAudioUpload, isSameOrigin } from "@/lib/stt/upload";
 
@@ -8,6 +9,9 @@ import { checkAudioUpload, isSameOrigin } from "@/lib/stt/upload";
 export async function POST(request: Request) {
   if (!isSameOrigin(request.headers.get("origin"), request.headers.get("host"))) {
     return Response.json({ error: "forbidden" }, { status: 403 });
+  }
+  if (!(await getAuthUserId())) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   let form: FormData;
