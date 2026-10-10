@@ -1,5 +1,4 @@
 import { LogOut } from "lucide-react";
-import { logout } from "@/lib/auth/actions";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +23,8 @@ export async function HeaderUserName({ className }: { className?: string }) {
 
 export function LogoutButton({ className }: { className?: string }) {
   return (
-    <form action={logout}>
+    // 일반 폼 전송: 페이지를 통째로 새로 불러와 이전 사용자의 화면 상태를 지운다
+    <form action="/auth/logout" method="post">
       <button type="submit" className={cn("flex items-center gap-2", className)}>
         <LogOut className="size-4" aria-hidden="true" />
         로그아웃

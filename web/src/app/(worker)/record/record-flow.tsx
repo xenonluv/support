@@ -13,7 +13,7 @@ import { clientLabel } from "@/lib/client-label";
 import { saveRecord } from "@/lib/records/actions";
 import { seoulDate } from "@/lib/records/dates";
 import { cn } from "@/lib/utils";
-import { RECORD_FIELDS, SERVICE_TYPES, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
+import { MAX_DURATION_MS, RECORD_FIELDS, SERVICE_TYPES, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
 
 export type RecordClient = { code: string; ageBand: number | null; dong: string };
 
@@ -123,18 +123,24 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
     if (!draft || !final) return;
     setBusy("saving");
     setError(null);
-    const result = await saveRecord({
-      clientCode,
-      transcript,
-      draft,
-      final,
-      inputMode: mode,
-      sttEngine: mode === "voice" ? sttEngine : null,
-      durationMs: startedAt ? Date.now() - startedAt : 0,
-    });
-    setBusy(null);
-    if (result.ok) setSaved(true);
-    else setError(result.error);
+    try {
+      const result = await saveRecord({
+        clientCode,
+        transcript,
+        draft,
+        final,
+        inputMode: mode,
+        sttEngine: mode === "voice" ? sttEngine : null,
+        durationMs: startedAt ? Math.min(Date.now() - startedAt, MAX_DURATION_MS) : 0,
+      });
+      if (result.ok) setSaved(true);
+      else setError(result.error);
+    } catch {
+      // 신호가 약해 서버에 닿지 못한 경우 — 고친 내용은 화면에 그대로 남아 있다
+      setError("저장하지 못했어요. 인터넷 연결을 확인하고 다시 [저장]을 눌러 주세요.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   function reset() {
@@ -272,7 +278,7 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
           <button
             type="button"
             onClick={handleRecord}
-            disabled={rec.status === "requesting" || busy === "transcribing"}
+            disabled={rec.status === "requesting" || busy !== null}
             className={cn(
               "flex size-40 flex-col items-center justify-center gap-1 rounded-full text-white shadow-lg disabled:opacity-60",
               recording ? "bg-caution" : "bg-primary",
@@ -321,7 +327,12 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
       >
         {busy === "drafting" ? "초안 만드는 중…" : "기록 초안 만들기"}
       </Button>
-      <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => openEditor(EMPTY_DRAFT, transcript)}>
+      <button
+        type="button"
+        disabled={recording || busy !== null}
+        className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-50"
+        onClick={() => openEditor(EMPTY_DRAFT, transcript)}
+      >
         AI 없이 직접 작성하기
       </button>
       <AiNotice />

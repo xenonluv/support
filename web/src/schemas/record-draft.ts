@@ -39,15 +39,27 @@ export const DraftRequestSchema = z.object({
   transcript: z.string().trim().min(5, "구술 내용이 너무 짧습니다").max(5000, "구술 내용이 너무 깁니다"),
 });
 
+/** 저장할 때 한 항목의 최대 글자 수 (수정 비율 계산 부하·DB 크기 제한) */
+export const MAX_FIELD_LENGTH = 2000;
+
+// AI 출력 형식(RecordDraftSchema)은 그대로 두고, 저장 입력에만 글자 수 상한을 건다
+const StoredDraftSchema = RecordDraftSchema.refine(
+  (d) => RECORD_FIELDS.every(({ key }) => d[key].length <= MAX_FIELD_LENGTH),
+  { message: `항목은 ${MAX_FIELD_LENGTH}자까지 쓸 수 있습니다` },
+);
+
+/** 작성시간 측정 상한: 하루 (방문이 길거나 화면을 오래 열어 둔 경우도 저장되도록) */
+export const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
+
 /** 저장 서버 액션 입력 */
 export const SaveRecordSchema = z.object({
   clientCode: z.string().regex(/^C-\d{4}$/),
   transcript: z.string().max(5000),
-  draft: RecordDraftSchema,
-  final: RecordDraftSchema,
+  draft: StoredDraftSchema,
+  final: StoredDraftSchema,
   inputMode: z.enum(["voice", "text"]),
   sttEngine: z.string().max(100).nullable(),
-  durationMs: z.number().int().min(0).max(3_600_000),
+  durationMs: z.number().int().min(0).max(MAX_DURATION_MS),
 });
 
 export type SaveRecordInput = z.infer<typeof SaveRecordSchema>;

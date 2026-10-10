@@ -76,7 +76,22 @@ const insert = await workerA.from("visit_records").insert({
   agency_id: myRow?.agency_id,
   input_mode: "text",
 });
-check("A 현장은 B 기관 대상자(C-0063)에 기록을 쓸 수 없다", Boolean(insert.error), insert.error?.code ?? "기록이 써졌음");
+// RLS 거부(42501)일 때만 통과로 본다 — 다른 오류(예: 필수 값 누락)로 실패한 것을 RLS 통과로 착각하지 않게
+check("A 현장은 B 기관 대상자(C-0063)에 기록을 쓸 수 없다", insert.error?.code === "42501", insert.error?.code ?? "기록이 써졌음");
+if (!insert.error) await admin.from("visit_records").delete().eq("client_id", target?.id).eq("worker_id", me.user?.id);
+
+// 5) 자기 기록의 대상자를 다른 기관 대상자로 바꿀 수 없다
+const { data: own } = await workerA.from("visit_records").select("id, client_id").eq("worker_id", me.user?.id).limit(1).single();
+if (!own) {
+  check("A 현장 본인 기록이 있어야 수정 검사를 할 수 있다", false, "기록 없음 — 앱에서 기록 1건 저장 후 다시 실행");
+} else {
+  // 결과를 돌려받지 않는 수정(RETURNING 없음)이어야 수정 정책만 시험된다
+  const moved = await workerA.from("visit_records").update({ client_id: target?.id }).eq("id", own.id);
+  const { data: after } = await admin.from("visit_records").select("client_id").eq("id", own.id).single();
+  const blocked = after?.client_id === own.client_id;
+  check("A 현장은 자기 기록의 대상자를 B 기관 대상자로 바꿀 수 없다", blocked, moved.error?.code ?? (blocked ? "변경 없음" : "대상자가 바뀌었음"));
+  if (!blocked) await admin.from("visit_records").update({ client_id: own.client_id }).eq("id", own.id); // 원래대로 되돌림
+}
 
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);

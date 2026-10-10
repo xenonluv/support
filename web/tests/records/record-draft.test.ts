@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DraftRequestSchema, RecordDraftSchema, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
+import { DraftRequestSchema, RecordDraftSchema, SaveRecordSchema, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
 
 const draft: RecordDraft = {
   summary: "혈압약 2일 미복용, 점심 절반 섭취",
@@ -47,5 +47,26 @@ describe("formatRecordText", () => {
 
   it("머리말 없이 본문만 만들 수도 있다", () => {
     expect(formatRecordText(draft).startsWith("요약:")).toBe(true);
+  });
+});
+
+describe("SaveRecordSchema", () => {
+  const ok = {
+    clientCode: "C-0012",
+    transcript: "어르신께서 점심을 드셨어요",
+    draft,
+    final: draft,
+    inputMode: "voice",
+    sttEngine: "groq/whisper-large-v3-turbo",
+    durationMs: 60_000,
+  };
+
+  it("방문이 길어 1시간 넘게 걸린 기록도 저장할 수 있다 (하루까지)", () => {
+    expect(SaveRecordSchema.safeParse({ ...ok, durationMs: 2 * 60 * 60 * 1000 }).success).toBe(true);
+  });
+
+  it("항목 글자 수가 비정상적으로 길면 거부한다 (서버 부하 방지)", () => {
+    expect(SaveRecordSchema.safeParse({ ...ok, final: { ...draft, notes: "가".repeat(2001) } }).success).toBe(false);
+    expect(SaveRecordSchema.safeParse({ ...ok, draft: { ...draft, summary: "가".repeat(2001) } }).success).toBe(false);
   });
 });

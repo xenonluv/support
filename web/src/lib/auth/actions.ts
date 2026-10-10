@@ -22,9 +22,3 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   }
   redirect(HOME[role]);
 }
-
-export async function logout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/login");
-}

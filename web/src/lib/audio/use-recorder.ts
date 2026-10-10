@@ -18,6 +18,8 @@ type Session = {
   ticker: ReturnType<typeof setInterval>;
   wakeLock: WakeLockSentinel | null;
   autoStopped: boolean;
+  /** 화면을 떠났거나 오류가 난 녹음 — 결과를 만들지도, 업로드하지도 않는다 */
+  discarded: boolean;
 };
 
 /**
@@ -78,7 +80,16 @@ export function useRecorder(
     }
 
     const mimeType = pickMimeType((t) => MediaRecorder.isTypeSupported(t));
-    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    let recorder: MediaRecorder;
+    try {
+      recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    } catch (e) {
+      // 녹음기를 만들지 못하면 마이크를 바로 닫는다
+      stream.getTracks().forEach((t) => t.stop());
+      setErrorName(e instanceof DOMException ? e.name : "RecorderError");
+      setStatus("error");
+      return false;
+    }
     const startedAt = Date.now();
     const s: Session = {
       stream,
@@ -92,12 +103,15 @@ export function useRecorder(
       ticker: setInterval(() => setElapsedMs(Date.now() - startedAt), 250),
       wakeLock: null,
       autoStopped: false,
+      discarded: false,
     };
 
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) s.chunks.push(e.data);
     };
     recorder.onstop = () => {
+      release();
+      if (s.discarded) return; // 떠난 화면·오류 난 녹음은 버린다
       const type = recorder.mimeType || mimeType || "audio/webm";
       const blob = new Blob(s.chunks, { type });
       if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
@@ -106,17 +120,25 @@ export function useRecorder(
       const result = { url, mimeType: type, size: blob.size, durationMs: Date.now() - s.startedAt, autoStopped: s.autoStopped };
       setRecording(result);
       setStatus("stopped");
-      release();
       onCompleteRef.current?.(result, blob);
     };
     recorder.onerror = () => {
+      s.discarded = true; // 뒤따르는 stop 이벤트가 '성공'으로 덮어쓰지 않게
       setErrorName("RecorderError");
       setStatus("error");
       release();
     };
 
     session.current = s;
-    recorder.start();
+    try {
+      recorder.start();
+    } catch (e) {
+      s.discarded = true;
+      release();
+      setErrorName(e instanceof DOMException ? e.name : "RecorderError");
+      setStatus("error");
+      return false;
+    }
     setElapsedMs(0);
     setRecording(null);
     setStatus("recording");
@@ -127,11 +149,15 @@ export function useRecorder(
     return true;
   }, [maxMs, release, stop]);
 
+  // 화면을 떠나면(숨김 포함) 진행 중인 녹음은 버리고 마이크를 닫는다. 끝난 녹음의 재생 주소는 그대로 둔다.
   useEffect(() => {
-    const urlRef = lastUrl;
+    const sessionRef = session;
     return () => {
+      const s = sessionRef.current;
+      if (!s) return;
+      s.discarded = true;
+      if (s.recorder.state !== "inactive") s.recorder.stop();
       release();
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
     };
   }, [release]);
 
