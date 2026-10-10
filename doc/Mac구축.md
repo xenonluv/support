@@ -173,11 +173,13 @@ npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir 
 cd web
 npx shadcn@latest init
 npm i @supabase/supabase-js @supabase/ssr @anthropic-ai/sdk groq-sdk zod
-npm i -D vitest @vitejs/plugin-react prettier supabase
+npm i -D vitest prettier supabase @types/node@24
 ```
-- `package.json`에 `"engines": { "node": ">=<설치한 LTS 메이저>" }` 추가, `web/.nvmrc`에 Node 버전 기록
+- `@vitejs/plugin-react`는 2026-10-10 기준 peer 의존성 충돌로 제외함. 1단계 테스트는 JSX가 필요 없음. 컴포넌트 테스트가 필요해지면 다시 검토.
+- `package.json`에 `"engines": { "node": "24.x" }` 추가, `web/.nvmrc`에 `24` 기록 (Vercel은 `24.x` 형식을 권장)
 - `tsconfig.json`은 `"strict": true` 유지
-- 스크립트: `dev`, `build`, `lint`, `typecheck`(`tsc --noEmit`), `test`(`vitest run`)
+- 스크립트: `dev`, `build`, `lint`, `typecheck`(`next typegen && tsc --noEmit`), `test`(`vitest run`)
+- 실제 실행 기록은 `doc/plans/2026-10-10-1단계-프로젝트-뼈대.md` 참조
 
 ### 3-3. 루트 `CLAUDE.md` 작성 (반드시 포함할 내용)
 - 이 프로젝트는 superpowers 흐름만 사용, bkit·SuperClaude 사용 안 함
