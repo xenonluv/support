@@ -1,0 +1,28 @@
+# 줄바꿈을 LF로 통일 (Windows·Mac·Vercel 공통)
+* text=auto eol=lf
+
+# Windows 전용 스크립트는 CRLF 유지
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 바이너리 파일
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.hwp binary
+*.hwpx binary
+*.pptx binary
+*.docx binary
+*.xlsx binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.mp4 binary
+*.webm binary
+*.m4a binary
