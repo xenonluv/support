@@ -15,6 +15,9 @@ export default function Home() {
         <Link href="/signals" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 text-base")}>
           관리자 대시보드 미리보기
         </Link>
+        <Link href="/mic-test" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 text-base")}>
+          마이크 테스트
+        </Link>
       </div>
       <p className="text-sm text-muted-foreground">로그인은 5단계에서 연결됩니다.</p>
     </main>

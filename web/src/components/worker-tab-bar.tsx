@@ -11,7 +11,7 @@ export function WorkerTabBar() {
   return (
     <nav
       aria-label="현장 메뉴"
-      className="fixed bottom-0 left-1/2 w-full max-w-md -translate-x-1/2 border-t bg-card"
+      className="fixed bottom-0 left-1/2 w-full max-w-md -translate-x-1/2 border-t bg-card pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="grid grid-cols-3">
         {WORKER_TABS.map(({ label, icon: Icon, href }) => {
