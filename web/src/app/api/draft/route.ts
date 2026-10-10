@@ -1,4 +1,5 @@
-import { DraftConfigError, DraftRefusedError, generateDraft } from "@/lib/ai/draft";
+import { AiConfigError, AiRefusedError } from "@/lib/ai/client";
+import { generateDraft } from "@/lib/ai/draft";
 import { getAuthUserId } from "@/lib/auth/session";
 import { maskPersonalInfo } from "@/lib/privacy/mask";
 import { findMyClient } from "@/lib/records/data";
@@ -35,11 +36,11 @@ export async function POST(request: Request) {
       : await generateDraft(transcript);
     return Response.json({ draft, signals, alertDraft, transcript, model, ms: Date.now() - started });
   } catch (e) {
-    if (e instanceof DraftRefusedError) {
+    if (e instanceof AiRefusedError) {
       console.error(`[draft] refused (${e.category ?? "unknown"})`);
       return Response.json({ error: "refused" }, { status: 422 });
     }
-    const code = e instanceof DraftConfigError ? "not-configured" : "draft-failed";
+    const code = e instanceof AiConfigError ? "not-configured" : "draft-failed";
     console.error(`[draft] ${code}`);
     return Response.json({ error: code }, { status: code === "not-configured" ? 500 : 502 });
   }

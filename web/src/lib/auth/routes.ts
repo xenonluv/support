@@ -4,7 +4,7 @@ export type Role = "worker" | "manager";
 export const HOME: Record<Role, string> = { worker: "/visits", manager: "/signals" };
 
 const WORKER_ONLY = ["/visits", "/record", "/my-records"];
-const MANAGER_ONLY = ["/signals"];
+const MANAGER_ONLY = ["/signals", "/briefing"];
 
 /** prefix와 같거나 그 아래 구간인지 (/signals-archive는 /signals 아래가 아님) */
 function under(pathname: string, prefix: string): boolean {

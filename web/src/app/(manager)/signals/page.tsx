@@ -87,6 +87,7 @@ async function SignalsContent({ searchParams }: Pick<PageProps<"/signals">, "sea
                 key={p.client.code}
                 rank={i + 1}
                 href={`/signals/${p.client.code}`}
+                briefingHref={`/briefing/${p.client.code}?days=${days}`}
                 client={p.client}
                 summary={signalSummary(p.signals, p.status)}
                 status={p.status}

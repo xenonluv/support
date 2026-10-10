@@ -1,13 +1,14 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { DraftConfigError, DraftFailedError, DraftRefusedError, generateDraft, type DraftClient } from "@/lib/ai/draft";
+import { AiConfigError, AiFailedError, AiRefusedError, type AiClient } from "@/lib/ai/client";
+import { generateDraft } from "@/lib/ai/draft";
 import { DRAFT_MODEL } from "@/lib/ai/models";
 import { DRAFT_FIXTURE, DRAFT_OUTPUT_FIXTURE } from "../fixtures/record-draft";
 
-type Reply = Awaited<ReturnType<DraftClient["messages"]["parse"]>>;
+type Reply = Awaited<ReturnType<AiClient["messages"]["parse"]>>;
 
 function fakeClient(reply: Partial<Reply>) {
-  const calls: Parameters<DraftClient["messages"]["parse"]>[0][] = [];
-  const client: DraftClient = {
+  const calls: Parameters<AiClient["messages"]["parse"]>[0][] = [];
+  const client: AiClient = {
     messages: {
       parse: async (params) => {
         calls.push(params);
@@ -63,28 +64,28 @@ describe("generateDraft", () => {
     expect(sent).not.toContain("김영희");
   });
 
-  it("거절(refusal)이면 분류와 함께 DraftRefusedError", async () => {
+  it("거절(refusal)이면 분류와 함께 AiRefusedError", async () => {
     const { client } = fakeClient({ stop_reason: "refusal", stop_details: { category: "general_harms" }, parsed_output: null });
     await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toMatchObject({
-      name: "DraftRefusedError",
+      name: "AiRefusedError",
       category: "general_harms",
     });
   });
 
-  it("결과를 해석하지 못하면 DraftFailedError", async () => {
+  it("결과를 해석하지 못하면 AiFailedError", async () => {
     const empty = fakeClient({ stop_reason: "max_tokens", parsed_output: null });
-    await expect(generateDraft("어르신 방문 기록입니다", empty.client)).rejects.toBeInstanceOf(DraftFailedError);
+    await expect(generateDraft("어르신 방문 기록입니다", empty.client)).rejects.toBeInstanceOf(AiFailedError);
     const wrong = fakeClient({ parsed_output: { summary: 1 } });
-    await expect(generateDraft("어르신 방문 기록입니다", wrong.client)).rejects.toBeInstanceOf(DraftFailedError);
+    await expect(generateDraft("어르신 방문 기록입니다", wrong.client)).rejects.toBeInstanceOf(AiFailedError);
   });
 
   it("ANTHROPIC_API_KEY가 없으면 설정 오류", async () => {
     delete process.env.ANTHROPIC_API_KEY;
-    await expect(generateDraft("어르신 방문 기록입니다")).rejects.toBeInstanceOf(DraftConfigError);
+    await expect(generateDraft("어르신 방문 기록입니다")).rejects.toBeInstanceOf(AiConfigError);
   });
 
-  it("거절 오류는 DraftRefusedError 클래스다", async () => {
+  it("거절 오류는 AiRefusedError 클래스다", async () => {
     const { client } = fakeClient({ stop_reason: "refusal", stop_details: null, parsed_output: null });
-    await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toBeInstanceOf(DraftRefusedError);
+    await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toBeInstanceOf(AiRefusedError);
   });
 });

@@ -8,7 +8,7 @@
 - `doc/plans/`: 단계별 실행 계획
 
 ## 현재 단계
-7단계(이상징후·대시보드) 완료 → 다음은 8단계(인수인계 브리핑). 시연 데이터: `npm run seed:demo`. 운영 주소 https://dolbomieum.kr. DB 관리: `npm run seed`, 권한 검증: `npm run test:rls`. 단계가 바뀔 때마다 이 줄을 갱신한다.
+8단계(인수인계 브리핑) 구현 완료, 운영 브리핑 점검 대기 → 다음은 9단계(파일럿·성과 측정). 시연 데이터: `npm run seed:demo`. 운영 주소 https://dolbomieum.kr. DB 관리: `npm run seed`, 권한 검증: `npm run test:rls`. 단계가 바뀔 때마다 이 줄을 갱신한다.
 
 ## 작업 방식
 - superpowers 흐름만 쓴다: 단계 시작 전 계획(writing-plans) → 실행 → 실제 실행 결과로 검증한 뒤 완료 보고. bkit·SuperClaude는 쓰지 않는다.

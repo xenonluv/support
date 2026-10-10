@@ -108,5 +108,30 @@ if (!flag) {
   await admin.from("flags").update({ status: flag.status }).eq("id", flag.id); // 원래대로
 }
 
+// 7) 브리핑: 본인 이름으로, 볼 수 있는 대상자에게만 저장. 같은 대상자를 돌보는 다른 기관도 읽는다
+const { data: managerMe } = await managerA.auth.getUser();
+const { data: workerBMe } = await workerB.auth.getUser();
+const period = { period_from: "2026-01-01", period_to: "2026-01-14", body: "RLS 검사용" };
+const made = await managerA
+  .from("briefings")
+  .insert({ ...period, client_id: c12?.id, created_by: managerMe.user?.id })
+  .select("id")
+  .single();
+check("A 관리자는 C-0012 브리핑을 저장할 수 있다", Boolean(made.data), made.error?.code ?? "");
+const seenByB = made.data ? (await workerB.from("briefings").select("id").eq("id", made.data.id)).data ?? [] : [];
+check("C-0012를 함께 돌보는 B 기관은 그 브리핑을 읽는다", seenByB.length === 1);
+const otherClient = await managerA.from("briefings").insert({ ...period, client_id: target?.id, created_by: managerMe.user?.id });
+check("A 관리자는 B 기관 대상자(C-0063) 브리핑을 저장할 수 없다", otherClient.error?.code === "42501", otherClient.error?.code ?? "저장됐음");
+const spoofed = await managerA.from("briefings").insert({ ...period, client_id: c12?.id, created_by: me.user?.id });
+check("다른 사람 이름으로 브리핑을 저장할 수 없다", spoofed.error?.code === "42501", spoofed.error?.code ?? "저장됐음");
+const hidden = await admin
+  .from("briefings")
+  .insert({ ...period, client_id: target?.id, created_by: workerBMe.user?.id })
+  .select("id")
+  .single();
+const seenByA = hidden.data ? (await workerA.from("briefings").select("id").eq("id", hidden.data.id)).data ?? [] : ["?"];
+check("A 현장은 C-0063 브리핑을 읽을 수 없다", seenByA.length === 0);
+await admin.from("briefings").delete().eq("body", "RLS 검사용"); // 검사용 행 정리
+
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);

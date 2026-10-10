@@ -27,7 +27,7 @@ export const MANAGER_NAV: NavSection[] = [
     items: [
       { label: "오늘의 방문", icon: CalendarCheck },
       { label: "기록 작성", icon: SquarePen },
-      { label: "인수인계 브리핑", icon: ClipboardList },
+      { label: "인수인계 브리핑", icon: ClipboardList, href: "/briefing" },
       { label: "이상징후 현황", icon: Siren, href: "/signals", countKey: "signals" },
     ],
   },

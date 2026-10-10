@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { buildDashboard, type DashFlag, type Dashboard, type PriorityClient } from "@/lib/dashboard/build";
+import { buildDashboard, type DashClient, type DashFlag, type Dashboard, type PriorityClient } from "@/lib/dashboard/build";
 import type { CountKey } from "@/components/manager-nav";
 import type { SignalLevel, SignalType } from "@/schemas/signal";
 
@@ -36,7 +36,9 @@ function toDashFlag(f: FlagRow): DashFlag {
   };
 }
 
-async function loadFlags(supabase: Awaited<ReturnType<typeof createClient>>, sinceIso: string, clientId?: string) {
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+async function loadFlags(supabase: Supabase, sinceIso: string, clientId?: string) {
   let query = supabase
     .from("flags")
     .select("client_id, type, level, status, created_at, resolved_at, outcome, evidence_quote, visit_records(agency_id)")
@@ -44,6 +46,15 @@ async function loadFlags(supabase: Awaited<ReturnType<typeof createClient>>, sin
   if (clientId) query = query.eq("client_id", clientId);
   const { data } = await query;
   return (data ?? []).map((f) => toDashFlag(f as FlagRow));
+}
+
+/**
+ * 한 대상자의 신호(최근 30일 + 해소되지 않은 것)를 대상자·종류별로 묶는다. 신호가 없으면 null.
+ * connection()을 쓰지 않으므로 서버 액션에서도 쓸 수 있다.
+ */
+export async function loadClientSignals(supabase: Supabase, client: DashClient, now: Date): Promise<PriorityClient | null> {
+  const flags = await loadFlags(supabase, new Date(now.getTime() - 30 * DAY_MS).toISOString(), client.id);
+  return buildDashboard({ clients: [client], flags, records: [], now, days: 30 }).priority[0] ?? null;
 }
 
 /** 이상징후 현황 화면 데이터 */
@@ -77,9 +88,9 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
   const supabase = await createClient();
   const { data: client } = await supabase.from("clients").select("id, code, age_band, dong").eq("code", code).maybeSingle();
   if (!client) return null;
-  const sinceIso = new Date(now.getTime() - 30 * DAY_MS).toISOString();
-  const [flags, { data: alerts }] = await Promise.all([
-    loadFlags(supabase, sinceIso, client.id),
+  const display = { id: client.id, code: client.code, ageBand: client.age_band, dong: client.dong };
+  const [item, { data: alerts }] = await Promise.all([
+    loadClientSignals(supabase, display, now),
     supabase
       .from("alert_drafts")
       .select("id, body, copied_at, created_at, flags!inner(client_id)")
@@ -87,11 +98,9 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
       .order("created_at", { ascending: false })
       .limit(1),
   ]);
-  const display = { id: client.id, code: client.code, ageBand: client.age_band, dong: client.dong };
-  const dash = buildDashboard({ clients: [display], flags, records: [], now, days: 30 });
   const latest = alerts?.[0];
   return {
-    item: dash.priority[0] ?? null,
+    item,
     code: client.code,
     ageBand: client.age_band,
     dong: client.dong,

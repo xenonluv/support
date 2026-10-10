@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { clientLabel, type ClientDisplay } from "@/lib/client-label";
 import { STATUS_META, type SignalStatus } from "@/lib/status";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { StatusBadge, ToneBadge } from "@/components/tone-badge";
 
 export type SummarySegment = { text: string; emphasis?: boolean };
@@ -23,11 +23,12 @@ const RANK_CLASS: Record<SignalStatus, string> = {
 export function ClientRankRow({
   rank,
   href,
+  briefingHref,
   client,
   summary,
   status,
   agencyCount,
-}: PriorityItem & { rank: number; href: string }) {
+}: PriorityItem & { rank: number; href: string; briefingHref: string }) {
   const label = clientLabel(client);
   return (
     <li
@@ -62,9 +63,9 @@ export function ClientRankRow({
       <div className="ml-auto flex items-center gap-2">
         <StatusBadge status={status} />
         <ToneBadge tone="neutral">{agencyCount}개 기관</ToneBadge>
-        <Button variant="outline" size="sm" disabled title="인수인계 브리핑은 8단계에서 연결됩니다">
+        <Link href={briefingHref} className={buttonVariants({ variant: "outline", size: "sm" })}>
           브리핑
-        </Button>
+        </Link>
       </div>
     </li>
   );

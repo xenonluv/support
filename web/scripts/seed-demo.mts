@@ -53,17 +53,55 @@ type Flag = {
   quote: string;
   resolved?: { daysAgo: number; linked: boolean };
 };
-type Visit = { code: string; worker: string; daysAgo: number; hour?: number; summary: string; flags?: Flag[]; alert?: string };
+type Fields = {
+  service_types?: string[];
+  health?: string;
+  medication?: string;
+  meals?: string;
+  mood?: string;
+  living?: string;
+  services_provided?: string;
+  notes?: string;
+  follow_up?: string;
+};
+// 브리핑(8단계)이 기관마다 다른 내용을 모으는지 볼 수 있게 항목을 채운다
+type Visit = { code: string; worker: string; daysAgo: number; hour?: number; summary: string; fields?: Fields; flags?: Flag[]; alert?: string };
 
 const visits: Visit[] = [
-  // C-0012: 두 기관이 함께 돌봄 — 여러 신호가 겹치는 사례
-  { code: "C-0012", worker: WA, daysAgo: 9, summary: "식사·복약 양호, 산책 동행" },
-  { code: "C-0012", worker: WB, daysAgo: 6, summary: "점심 절반 섭취", flags: [{ type: "reduced_meal", level: "observe", quote: "점심을 절반만 드셨어요" }] },
+  // C-0012: 두 기관이 함께 돌봄 — 여러 신호가 겹치는 사례. A(동센터)는 복약·안전, B(수행기관)는 목욕·병원 동행
+  {
+    code: "C-0012",
+    worker: WA,
+    daysAgo: 9,
+    summary: "식사·복약 양호, 산책 동행",
+    fields: { meals: "세 끼 모두 드심", medication: "혈압약 정상 복용", services_provided: "안부 확인, 동네 산책 동행" },
+  },
+  {
+    code: "C-0012",
+    worker: WB,
+    daysAgo: 6,
+    summary: "점심 절반 섭취, 목욕 지원",
+    fields: { service_types: ["일상생활지원"], meals: "점심 절반 섭취", services_provided: "목욕 지원, 반찬 전달" },
+    flags: [{ type: "reduced_meal", level: "observe", quote: "점심을 절반만 드셨어요" }],
+  },
+  {
+    code: "C-0012",
+    worker: WB,
+    daysAgo: 4,
+    summary: "무릎 통증으로 정형외과 진료 동행",
+    fields: {
+      service_types: ["일상생활지원"],
+      health: "오른쪽 무릎 통증 호소, 정형외과 진료 받음",
+      services_provided: "병원 동행",
+      follow_up: "다음 주 수요일 물리치료 예약, 동행 필요",
+    },
+  },
   {
     code: "C-0012",
     worker: WA,
     daysAgo: 2,
     summary: "혈압약 2일째 미복용",
+    fields: { medication: "혈압약 이틀째 미복용, 약 봉투가 그대로 남아 있음", follow_up: "복약 달력 설치 검토" },
     flags: [{ type: "missed_medication", level: "caution", quote: "혈압약을 이틀째 안 드셨다고 하셨어요" }],
   },
   {
@@ -72,6 +110,7 @@ const visits: Visit[] = [
     daysAgo: 0,
     hour: 9,
     summary: "화장실 문턱에서 휘청거림",
+    fields: { living: "화장실 문턱이 높음", notes: "화장실 문턱에서 한 번 휘청함, 다친 곳 없음", follow_up: "주거 안전 점검(문턱) 연계 검토" },
     flags: [{ type: "fall", level: "observe", quote: "화장실 문턱에서 한 번 휘청하셨어요" }],
     alert:
       "화정1동 통합돌봄 담당자님, C-0012 어르신께서 혈압약을 이틀째 드시지 않았고 오늘 화장실 문턱에서 휘청하신 일이 있어 확인이 필요해 공유드립니다. 복약 확인과 주거 안전 점검 연계를 검토해 주세요.",
@@ -105,7 +144,7 @@ const visits: Visit[] = [
   },
 ];
 
-const record = (summary: string) => ({
+const record = (summary: string, fields: Fields = {}) => ({
   summary,
   service_types: ["안전지원"],
   health: "",
@@ -116,6 +155,7 @@ const record = (summary: string) => ({
   services_provided: "안부 확인",
   notes: "",
   follow_up: "",
+  ...fields,
 });
 
 let flagCount = 0;
@@ -132,8 +172,8 @@ for (const v of visits) {
         visited_at: at,
         created_at: at,
         transcript_text: null,
-        draft_json: record(v.summary),
-        final_json: record(v.summary),
+        draft_json: record(v.summary, v.fields),
+        final_json: record(v.summary, v.fields),
         edited: false,
         edit_ratio: 0,
         input_mode: "voice",

@@ -12,7 +12,7 @@ vi.mock("@/lib/ai/draft", async (importOriginal) => ({
 }));
 
 const { POST } = await import("@/app/api/draft/route");
-const { DraftConfigError, DraftRefusedError } = await import("@/lib/ai/draft");
+const { AiConfigError, AiRefusedError } = await import("@/lib/ai/client");
 
 function request(body: unknown, origin = "https://dolbomieum.kr") {
   return new Request("https://dolbomieum.kr/api/draft", {
@@ -65,12 +65,12 @@ describe("POST /api/draft", () => {
   });
 
   it("거절은 422, 키 미설정은 500, 그 밖의 실패는 502 — 응답에는 오류 종류만", async () => {
-    draftMock.mockRejectedValueOnce(new DraftRefusedError("general_harms"));
+    draftMock.mockRejectedValueOnce(new AiRefusedError("general_harms"));
     const refused = await POST(request({ transcript: "어르신 방문 기록입니다" }));
     expect(refused.status).toBe(422);
     expect(await refused.json()).toEqual({ error: "refused" });
 
-    draftMock.mockRejectedValueOnce(new DraftConfigError());
+    draftMock.mockRejectedValueOnce(new AiConfigError());
     expect((await POST(request({ transcript: "어르신 방문 기록입니다" }))).status).toBe(500);
 
     draftMock.mockRejectedValueOnce(new Error("upstream down"));

@@ -4,15 +4,9 @@ import { useState, useTransition } from "react";
 import { ToneBadge } from "@/components/tone-badge";
 import type { ClientSignal } from "@/lib/dashboard/build";
 import { updateSignalStatus } from "@/lib/dashboard/actions";
+import { FLAG_STATUS_LABEL } from "@/lib/status";
 import { cn } from "@/lib/utils";
 import { SIGNAL_LABEL, type SignalType } from "@/schemas/signal";
-
-const STATUS_LABEL: Record<ClientSignal["status"], string> = {
-  unchecked: "미확인",
-  checked: "확인함",
-  acting: "조치 중",
-  resolved: "해소",
-};
 
 type Next = { status: "checked" | "acting" | "resolved"; linked?: boolean; label: string };
 const ACTIONS: Next[] = [
@@ -41,7 +35,7 @@ export function SignalStatusCard({ clientCode, signal }: { clientCode: string; s
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-semibold">{SIGNAL_LABEL[signal.type]}</h3>
         <span className="flex gap-1.5">
-          <ToneBadge tone="neutral">{STATUS_LABEL[signal.status]}</ToneBadge>
+          <ToneBadge tone="neutral">{FLAG_STATUS_LABEL[signal.status]}</ToneBadge>
           <ToneBadge tone={resolved ? "normal" : signal.level === "caution" ? "caution" : "observe"}>
             {resolved ? "해소" : signal.isNew ? "신규" : `${signal.days}일째`}
           </ToneBadge>

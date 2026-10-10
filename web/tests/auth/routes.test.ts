@@ -23,6 +23,8 @@ describe("decideRoute", () => {
   it("현장 인력이 관리자 화면에 오면 현장 홈으로, 관리자가 현장 화면에 오면 관리자 홈으로 보낸다", () => {
     expect(decideRoute("/signals", worker)).toBe("/visits");
     expect(decideRoute("/signals/C-0012", worker)).toBe("/visits");
+    expect(decideRoute("/briefing", worker)).toBe("/visits");
+    expect(decideRoute("/briefing/C-0012", worker)).toBe("/visits");
     expect(decideRoute("/visits", manager)).toBe("/signals");
     expect(decideRoute("/record", manager)).toBe("/signals");
     expect(decideRoute("/my-records", manager)).toBe("/signals");
@@ -32,6 +34,7 @@ describe("decideRoute", () => {
     expect(decideRoute("/visits", worker)).toBeNull();
     expect(decideRoute("/record", worker)).toBeNull();
     expect(decideRoute("/signals/C-0012", manager)).toBeNull();
+    expect(decideRoute("/briefing/C-0012", manager)).toBeNull();
     expect(decideRoute("/mic-test", worker)).toBeNull();
     expect(decideRoute("/mic-test", manager)).toBeNull();
   });
