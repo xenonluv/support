@@ -14,7 +14,7 @@ export default function MicTestPage() {
         <div>
           <h1 className="text-xl font-bold">마이크 테스트</h1>
           <p className="text-sm text-muted-foreground">
-            녹음은 이 휴대폰 안에서만 재생되고 서버로 보내지 않습니다. 최대 2분까지 녹음됩니다.
+            녹음은 이 휴대폰 안에서 재생됩니다. [글자로 변환]을 누를 때만 서버(Groq)로 보냅니다. 최대 2분까지 녹음됩니다.
           </p>
         </div>
         <MicTest />

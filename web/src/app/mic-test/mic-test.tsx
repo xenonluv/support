@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { describeBrowser, externalOpenUrl, permissionHelp } from "@/lib/audio/browser";
 import { readAudioEnvironment } from "@/lib/audio/environment";
 import { formatBytes, formatDuration } from "@/lib/audio/format";
+import { audioFileName } from "@/lib/audio/mime";
 import { buildReport, type SpeechMode } from "@/lib/audio/report";
 import { useRecorder } from "@/lib/audio/use-recorder";
 import { useSpeechPreview } from "@/lib/audio/use-speech-preview";
@@ -24,6 +25,17 @@ const SPEECH_ERROR_LABEL: Record<string, string> = {
   "not-supported": "이 브라우저는 실시간 글자를 지원하지 않아요",
   "start-failed": "실시간 글자를 시작하지 못했어요",
   aborted: "실시간 글자가 중간에 멈췄어요",
+};
+
+type SttState = { status: "idle" | "loading" | "ok" | "error"; text: string; ms: number | null; error: string | null };
+const IDLE_STT: SttState = { status: "idle", text: "", ms: null, error: null };
+
+const STT_ERROR_LABEL: Record<string, string> = {
+  forbidden: "허용되지 않은 요청이에요",
+  "too-large": "녹음이 너무 길어요(4MB 초과)",
+  "not-configured": "서버에 Groq 키가 설정되지 않았어요",
+  "stt-failed": "Groq 변환에 실패했어요",
+  network: "인터넷 연결에 문제가 있어요",
 };
 
 const PERMISSION_LABEL: Record<PermissionState, string> = {
@@ -63,6 +75,7 @@ export function MicTest() {
   const [withSpeech, setWithSpeech] = useState(false);
   const [speechMode, setSpeechMode] = useState<SpeechMode | null>(null);
   const [playbackOk, setPlaybackOk] = useState<boolean | null>(null);
+  const [stt, setStt] = useState<SttState>(IDLE_STT);
   const { stop: stopSpeech } = speech;
 
   // 2분 자동 종료 등으로 녹음이 끝나면, 녹음과 함께 켠 실시간 글자도 멈춘다
@@ -77,10 +90,31 @@ export function MicTest() {
 
   async function handleStart() {
     setPlaybackOk(null);
+    setStt(IDLE_STT);
     const ok = await rec.start();
     if (ok && withSpeech) {
       setSpeechMode("with-recording");
       speech.start();
+    }
+  }
+
+  /** 녹음을 서버로 보내 글자로 바꾼다. 걸린 시간은 업로드부터 응답까지(사용자가 기다리는 시간). */
+  async function handleTranscribe() {
+    const current = rec.recording;
+    if (!current) return;
+    setStt({ ...IDLE_STT, status: "loading" });
+    const started = performance.now();
+    try {
+      const blob = await (await fetch(current.url)).blob();
+      const form = new FormData();
+      form.append("audio", blob, audioFileName(current.mimeType));
+      const res = await fetch("/api/transcribe", { method: "POST", body: form });
+      const data = (await res.json().catch(() => ({}))) as { text?: string; error?: string };
+      const ms = Math.round(performance.now() - started);
+      if (res.ok && typeof data.text === "string") setStt({ status: "ok", text: data.text, ms, error: null });
+      else setStt({ status: "error", text: "", ms, error: data.error ?? `http-${res.status}` });
+    } catch {
+      setStt({ status: "error", text: "", ms: null, error: "network" });
     }
   }
 
@@ -107,6 +141,7 @@ export function MicTest() {
     recorderError: rec.errorName,
     playbackOk,
     speech: { mode: speechMode, textLength: speech.text.length, error: speech.error },
+    transcription: { status: stt.status, ms: stt.ms, textLength: stt.text.length, error: stt.error },
   });
 
   return (
@@ -232,6 +267,26 @@ export function MicTest() {
             >
               안 들림
             </Button>
+          </div>
+          <div className="flex flex-col gap-2 border-t pt-3">
+            <Button size="lg" className="h-11 text-base" disabled={stt.status === "loading"} onClick={handleTranscribe}>
+              {stt.status === "loading" ? "글자로 바꾸는 중…" : "글자로 변환 (서버)"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              녹음을 Groq(미국) 서버로 보내 글자로 바꿉니다. 돌봄이음은 녹음과 글자를 저장하지 않습니다. 테스트 문장만
+              말해 주세요.
+            </p>
+            {stt.status === "ok" && (
+              <div className="rounded-lg bg-muted p-3">
+                <p className="text-sm leading-relaxed">{stt.text || "(인식된 글자가 없어요)"}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{((stt.ms ?? 0) / 1000).toFixed(1)}초 걸림</p>
+              </div>
+            )}
+            {stt.status === "error" && (
+              <p className="text-sm text-caution">
+                글자로 바꾸지 못했어요: {STT_ERROR_LABEL[stt.error ?? ""] ?? "알 수 없는 오류"} ({stt.error})
+              </p>
+            )}
           </div>
         </section>
       )}

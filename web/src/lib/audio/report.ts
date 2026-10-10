@@ -10,6 +10,8 @@ export type ReportInput = {
   playbackOk: boolean | null;
   /** 실시간 글자 시험. 구술 내용은 개인정보라 글자 수만 받는다 */
   speech: { mode: SpeechMode | null; textLength: number; error: string | null };
+  /** 서버 글자 변환(Groq) 시험. ms는 업로드부터 응답까지 걸린 시간 */
+  transcription: { status: "idle" | "loading" | "ok" | "error"; ms: number | null; textLength: number; error: string | null };
 };
 
 /** 실시간 글자를 녹음과 함께 시험했는지, 따로 시험했는지 */
@@ -20,7 +22,7 @@ const SPEECH_MODE_LABEL: Record<SpeechMode, string> = { "with-recording": "녹�
 const yes = (b: boolean) => (b ? "예" : "아니오");
 
 /** 마이크 테스트 결과를 붙여 넣기 좋은 여러 줄 텍스트로 만든다. */
-export function buildReport({ env, permission, recording, recorderError, playbackOk, speech }: ReportInput): string {
+export function buildReport({ env, permission, recording, recorderError, playbackOk, speech, transcription }: ReportInput): string {
   const recordLine = recording
     ? `녹음: 성공 · ${recording.mimeType} · ${formatBytes(recording.size)} · ${formatDuration(recording.durationMs)}${recording.autoStopped ? " (2분 자동 종료)" : ""}`
     : `녹음: ${recorderError ? `실패 (${recorderError})` : "안 함"}`;
@@ -28,6 +30,12 @@ export function buildReport({ env, permission, recording, recorderError, playbac
   const speechLine = speech.mode
     ? `실시간 글자(${SPEECH_MODE_LABEL[speech.mode]}): ${speech.error ? `오류 (${speech.error})` : speech.textLength > 0 ? `${speech.textLength}자 인식` : "인식된 글자 없음"}`
     : "실시간 글자: 안 함";
+  const sttLine =
+    transcription.status === "ok"
+      ? `글자 변환: 성공 · ${((transcription.ms ?? 0) / 1000).toFixed(1)}초 · ${transcription.textLength}자`
+      : transcription.status === "error"
+        ? `글자 변환: 실패 (${transcription.error ?? "알 수 없음"})`
+        : "글자 변환: 안 함";
   return [
     "[돌봄이음 마이크 테스트]",
     `기기·브라우저: ${describeBrowser(env.browser)}${env.standalone ? " (홈 화면 앱)" : ""}`,
@@ -37,6 +45,7 @@ export function buildReport({ env, permission, recording, recorderError, playbac
     recordLine,
     playbackLine,
     speechLine,
+    sttLine,
     `UA: ${env.userAgent}`,
   ].join("\n");
 }

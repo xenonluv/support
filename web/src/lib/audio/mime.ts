@@ -5,3 +5,10 @@ const CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/
 export function pickMimeType(isSupported: (type: string) => boolean): string | null {
   return CANDIDATES.find((t) => isSupported(t)) ?? null;
 }
+
+/** 업로드할 파일 이름. Groq는 확장자로 형식을 알아본다. */
+export function audioFileName(mimeType: string): string {
+  if (mimeType.startsWith("audio/mp4") || mimeType.startsWith("video/mp4")) return "recording.m4a";
+  if (mimeType.startsWith("audio/ogg")) return "recording.ogg";
+  return "recording.webm";
+}
