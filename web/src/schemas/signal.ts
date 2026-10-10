@@ -18,6 +18,9 @@ export type SignalLevel = (typeof SIGNAL_LEVELS)[number];
 
 export const SIGNAL_LEVEL_LABEL: Record<SignalLevel, string> = { observe: "관찰", caution: "주의" };
 
+/** 근거 문장 저장 상한 (SaveRecordSchema와 같은 값) */
+export const MAX_EVIDENCE_LENGTH = 500;
+
 export const SignalSchema = z.object({
   type: z.enum(SIGNAL_TYPES).describe("신호 종류"),
   level: z.enum(SIGNAL_LEVELS).describe("확인 우선순위 제안: caution(먼저 확인) 또는 observe(지켜봄)"),
@@ -39,7 +42,9 @@ export function keepGroundedSignals(signals: readonly Signal[], transcript: stri
     const quote = normalize(s.evidence_quote);
     if (quote.length < 4 || !source.includes(quote)) continue;
     const prev = byType.get(s.type);
-    if (!prev || (prev.level === "observe" && s.level === "caution")) byType.set(s.type, s);
+    // 앞부분만 잘라도 구술에 그대로 있는 문장이므로 근거로 유효하다
+    const kept = s.evidence_quote.length > MAX_EVIDENCE_LENGTH ? { ...s, evidence_quote: s.evidence_quote.slice(0, MAX_EVIDENCE_LENGTH) } : s;
+    if (!prev || (prev.level === "observe" && s.level === "caution")) byType.set(s.type, kept);
   }
   return [...byType.values()];
 }
@@ -51,4 +56,6 @@ export const SignalStatusUpdateSchema = z.object({
   status: z.enum(["checked", "acting", "resolved"]),
   /** 해소할 때 '연계로 이어짐' (이번 달 조기 발견 집계) */
   linked: z.boolean().optional(),
+  /** 관리자가 화면을 연 시각. 그 뒤에 들어온 새 신호는 함께 바꾸지 않는다 */
+  seenAt: z.iso.datetime(),
 });

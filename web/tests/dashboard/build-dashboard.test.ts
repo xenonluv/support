@@ -65,6 +65,20 @@ describe("buildDashboard — 먼저 확인할 어르신", () => {
   it("진행 상태(확인함)를 신호에 붙인다", () => {
     expect(dash.priority[1].signals[0].status).toBe("checked");
   });
+
+  it("같은 종류에 아직 확인하지 않은 새 신호가 있으면 덜 진행된 상태(미확인)로 보인다", () => {
+    const later = buildDashboard({
+      clients,
+      flags: [
+        flag({ clientId: "b", type: "missed_medication", level: "observe", createdAt: "2026-10-10T05:00:00Z", status: "acting" }),
+        flag({ clientId: "b", type: "missed_medication", level: "caution", createdAt: "2026-10-13T05:00:00Z" }),
+      ],
+      records: [],
+      now,
+      days: 14,
+    });
+    expect(later.priority[0].signals[0].status).toBe("unchecked");
+  });
 });
 
 describe("buildDashboard — 요약", () => {

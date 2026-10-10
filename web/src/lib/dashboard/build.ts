@@ -72,7 +72,8 @@ function summarize(group: DashFlag[], now: Date, untilKey: string): ClientSignal
     days: dayNumber(untilKey) - dayNumber(seoulDate(first.createdAt)) + 1,
     isNew: now.getTime() - new Date(first.createdAt).getTime() < 2 * DAY_MS,
     agencyCount: new Set(group.map((f) => f.agencyId)).size,
-    status: group.reduce<FlagStatus>((s, f) => (PROGRESS[f.status] > PROGRESS[s] ? f.status : s), "unchecked"),
+    // 가장 덜 진행된 상태를 보인다: '조치 중'인 종류에 새 신호가 들어오면 다시 '미확인'으로 드러난다
+    status: group.reduce<FlagStatus>((s, f) => (PROGRESS[f.status] < PROGRESS[s] ? f.status : s), group[0].status),
     evidence: latest.evidence,
   };
 }

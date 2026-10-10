@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SignalSchema } from "@/schemas/signal";
+import { MAX_EVIDENCE_LENGTH, SignalSchema } from "@/schemas/signal";
 
 // 기록 초안 서식 — 단일 출처. 「2026년 노인맞춤돌봄서비스 사업안내」 원문을 받으면 이 파일만 바꾼다.
 
@@ -64,7 +64,7 @@ export const SaveRecordSchema = z.object({
   sttEngine: z.string().max(100).nullable(),
   durationMs: z.number().int().min(0).max(MAX_DURATION_MS),
   /** 현장 인력이 확인하고 남긴 신호 (뺀 신호는 저장하지 않는다) */
-  signals: z.array(SignalSchema.extend({ evidence_quote: z.string().max(500) })).max(5).default([]),
+  signals: z.array(SignalSchema.extend({ evidence_quote: z.string().max(MAX_EVIDENCE_LENGTH) })).max(5).default([]),
   alertDraft: z.string().max(MAX_FIELD_LENGTH).default(""),
 });
 

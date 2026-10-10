@@ -58,8 +58,8 @@ async function Detail({ params }: Pick<PageProps<"/signals/[clientId]">, "params
             </p>
           </section>
         )}
-        {item?.signals.map((s) => <SignalStatusCard key={s.type} clientCode={detail.code} signal={s} />)}
-        {detail.alert && item?.status !== "resolved" && (
+        {item?.signals.map((s) => <SignalStatusCard key={s.type} clientCode={detail.code} signal={s} seenAt={detail.asOf} />)}
+        {detail.alert && item && item.status !== "resolved" && (
           <AlertDraft initialText={detail.alert.body} alertId={detail.alert.id} copiedAt={detail.alert.copiedAt} />
         )}
         <AiNotice className="py-2" />

@@ -29,10 +29,11 @@ describe("signalSummary", () => {
 
 describe("SignalStatusUpdateSchema", () => {
   it("확인·조치 중·해소만 받고, 연계 여부는 해소일 때만 의미가 있다", () => {
-    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "acting" }).success).toBe(true);
-    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "resolved", linked: true }).success).toBe(true);
-    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "unchecked" }).success).toBe(false);
-    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "x", type: "fall", status: "checked" }).success).toBe(false);
+    const seenAt = "2026-10-11T03:00:00.000Z";
+    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "acting", seenAt }).success).toBe(true);
+    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "resolved", linked: true, seenAt }).success).toBe(true);
+    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "C-0012", type: "fall", status: "unchecked", seenAt }).success).toBe(false);
+    expect(SignalStatusUpdateSchema.safeParse({ clientCode: "x", type: "fall", status: "checked", seenAt }).success).toBe(false);
   });
 });
 

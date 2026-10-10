@@ -79,7 +79,15 @@ export async function getDashboard(days: number): Promise<Dashboard & { asOf: Da
 }
 
 export type AlertInfo = { id: string; body: string; copiedAt: string | null };
-export type ClientDetail = { item: PriorityClient | null; code: string; ageBand: number | null; dong: string; alert: AlertInfo | null };
+export type ClientDetail = {
+  item: PriorityClient | null;
+  code: string;
+  ageBand: number | null;
+  dong: string;
+  alert: AlertInfo | null;
+  /** 화면 데이터를 읽은 시각 — 상태 변경 범위를 이 시각까지로 묶는다 */
+  asOf: string;
+};
 
 /** 알림 상세 화면 데이터 (식별번호로 찾음). 볼 수 없는 대상자면 null */
 export async function getClientDetail(code: string): Promise<ClientDetail | null> {
@@ -93,8 +101,10 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
     loadClientSignals(supabase, display, now),
     supabase
       .from("alert_drafts")
-      .select("id, body, copied_at, created_at, flags!inner(client_id)")
+      // 해소되지 않은 신호에 붙은 문안만 — 지난(해소된) 일의 문안을 지금 일처럼 복사해 보내지 않게
+      .select("id, body, copied_at, created_at, flags!inner(client_id, status)")
       .eq("flags.client_id", client.id)
+      .neq("flags.status", "resolved")
       .order("created_at", { ascending: false })
       .limit(1),
   ]);
@@ -105,6 +115,7 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
     ageBand: client.age_band,
     dong: client.dong,
     alert: latest ? { id: latest.id, body: latest.body, copiedAt: latest.copied_at } : null,
+    asOf: now.toISOString(),
   };
 }
 

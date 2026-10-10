@@ -5,7 +5,8 @@ import { buildRecordRow } from "@/lib/records/row";
 import { createClient } from "@/lib/supabase/server";
 import { SaveRecordSchema } from "@/schemas/record-draft";
 
-export type SaveResult = { ok: true; id: string; visitedAt: string } | { ok: false; error: string };
+/** warning: 기록은 저장됐지만 신호·알림 문안을 저장하지 못한 경우. 다시 저장하면 기록이 중복되므로 '저장됨'으로 처리한다. */
+export type SaveResult = { ok: true; id: string; visitedAt: string; warning?: string } | { ok: false; error: string };
 
 /** 방문 기록 저장. 로그인 사용자 권한으로 insert하므로 RLS가 본인·내 기관 대상자만 허용한다. */
 export async function saveRecord(input: unknown): Promise<SaveResult> {
@@ -31,7 +32,7 @@ export async function saveRecord(input: unknown): Promise<SaveResult> {
     return { ok: false, error: "저장하지 못했습니다. 잠시 뒤 다시 시도해 주세요." };
   }
 
-  // 신호와 알림 문안 (기록은 이미 저장됨 — 실패하면 기록은 두고 안내만 한다)
+  // 신호와 알림 문안 (기록은 이미 저장됨 — 실패해도 '저장됨'으로 알리고 경고만 붙인다. 다시 저장하면 기록이 중복된다)
   const flagRows = buildFlagRows(parsed.data.signals, { recordId: data.id, clientId: client.id });
   if (flagRows.length > 0) {
     const { data: flags, error: flagError } = await supabase.from("flags").insert(flagRows).select("id");
@@ -39,7 +40,12 @@ export async function saveRecord(input: unknown): Promise<SaveResult> {
     const alertError = alertRow ? (await supabase.from("alert_drafts").insert(alertRow)).error : null;
     if (flagError || alertError) {
       console.error(`[save] signals ${flagError?.code ?? alertError?.code ?? "unknown"}`);
-      return { ok: false, error: "기록은 저장했지만 신호를 저장하지 못했어요. 담당자에게 알려 주세요." };
+      return {
+        ok: true,
+        id: data.id,
+        visitedAt: data.visited_at,
+        warning: "기록은 저장했지만 확인이 필요한 신호를 함께 저장하지 못했어요. 다시 저장하지 말고 관리자에게 알려 주세요.",
+      };
     }
   }
   return { ok: true, id: data.id, visitedAt: data.visited_at };

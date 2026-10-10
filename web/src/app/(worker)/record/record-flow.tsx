@@ -147,10 +147,13 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
         sttEngine: mode === "voice" ? sttEngine : null,
         durationMs: startedAt ? Math.min(Date.now() - startedAt, MAX_DURATION_MS) : 0,
         signals: kept,
-        alertDraft: kept.length > 0 ? alertDraft : "",
+        // AI 알림 문안은 신호 전체를 보고 쓴 글이라, 하나라도 뺐으면 뺀 신호 내용이 남아 있을 수 있어 보내지 않는다
+        alertDraft: kept.length > 0 && removed.size === 0 ? alertDraft : "",
       });
-      if (result.ok) setSaved(true);
-      else setError(result.error);
+      if (result.ok) {
+        setSaved(true);
+        setError(result.warning ?? null);
+      } else setError(result.error);
     } catch {
       // 신호가 약해 서버에 닿지 못한 경우 — 고친 내용은 화면에 그대로 남아 있다
       setError("저장하지 못했어요. 인터넷 연결을 확인하고 다시 [저장]을 눌러 주세요.");
@@ -187,10 +190,15 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
         <div className="rounded-xl border border-normal/30 bg-normal-soft p-4">
           <p className="font-bold text-normal">저장했어요</p>
           <p className="mt-1 text-sm">{label.title} · {draftDate}</p>
-          {kept.length > 0 && (
+          {kept.length > 0 && !error && (
             <p className="mt-1 text-sm">확인이 필요한 신호 {kept.length}건을 동 담당자 화면에 공유했어요.</p>
           )}
         </div>
+        {error && (
+          <p role="alert" className="rounded-xl border border-caution/30 bg-caution-soft p-3 text-sm text-caution">
+            {error}
+          </p>
+        )}
         <pre className="rounded-xl border bg-card p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">{copyText}</pre>
         <CopyButton text={copyText} />
         <div className="grid grid-cols-2 gap-2">

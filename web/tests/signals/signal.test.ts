@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SIGNAL_LABEL, keepGroundedSignals, type Signal } from "@/schemas/signal";
+import { MAX_EVIDENCE_LENGTH, SIGNAL_LABEL, keepGroundedSignals, type Signal } from "@/schemas/signal";
 
 const transcript = "어르신께서 혈압약을 이틀째 안 드셨어요. 화장실 문턱에서 한 번 휘청하셨어요.";
 
@@ -23,6 +23,13 @@ describe("keepGroundedSignals", () => {
       { type: "missed_medication", level: "caution", evidence_quote: "이틀째 안 드셨어요" },
     ];
     expect(keepGroundedSignals(signals, transcript)).toEqual([signals[1]]);
+  });
+
+  it(`근거가 ${MAX_EVIDENCE_LENGTH}자를 넘으면 잘라서 남긴다 (저장 상한을 넘어 기록 저장이 막히지 않게)`, () => {
+    const long = "어르신께서 약을 드시지 않았다고 하셨어요 ".repeat(30);
+    const [kept] = keepGroundedSignals([{ type: "missed_medication", level: "caution", evidence_quote: long }], long);
+    expect(kept.evidence_quote.length).toBe(MAX_EVIDENCE_LENGTH);
+    expect(long.startsWith(kept.evidence_quote)).toBe(true);
   });
 
   it("근거가 너무 짧으면(4자 미만) 우연히 겹친 것으로 보고 버린다", () => {

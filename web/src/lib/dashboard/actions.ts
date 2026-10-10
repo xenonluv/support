@@ -6,11 +6,11 @@ import { SignalStatusUpdateSchema } from "@/schemas/signal";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-/** 대상자·신호 종류 단위로 상태를 바꾼다. 관리자만 가능(RLS flags_update). */
+/** 대상자·신호 종류 단위로 상태를 바꾼다. 관리자만 가능(RLS flags_update). 화면을 연 뒤 들어온 신호는 건드리지 않는다. */
 export async function updateSignalStatus(input: unknown): Promise<ActionResult> {
   const parsed = SignalStatusUpdateSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "요청을 확인해 주세요." };
-  const { clientCode, type, status, linked } = parsed.data;
+  const { clientCode, type, status, linked, seenAt } = parsed.data;
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -32,6 +32,7 @@ export async function updateSignalStatus(input: unknown): Promise<ActionResult> 
     .eq("client_id", client.id)
     .eq("type", type)
     .neq("status", "resolved")
+    .lte("created_at", seenAt)
     .select("id");
   if (error || !data || data.length === 0) {
     console.error(`[signal-status] ${error?.code ?? "no-rows"}`);

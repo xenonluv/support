@@ -64,6 +64,14 @@ describe("generateDraft", () => {
     expect(sent).not.toContain("김영희");
   });
 
+  it("대상자 머리말도 가린 뒤 보낸다", async () => {
+    const { client, calls } = fakeClient({});
+    await generateDraft("어르신 방문 기록입니다", client, { code: "C-0012", ageBand: 70, dong: "서구 화정1동 010-1234-5678" });
+    const sent = JSON.stringify(calls[0].messages);
+    expect(sent).toContain("<대상자>C-0012 · 70대 · 서구 화정1동 [전화번호]</대상자>");
+    expect(sent).not.toContain("010-1234-5678");
+  });
+
   it("거절(refusal)이면 분류와 함께 AiRefusedError", async () => {
     const { client } = fakeClient({ stop_reason: "refusal", stop_details: { category: "general_harms" }, parsed_output: null });
     await expect(generateDraft("어르신 방문 기록입니다", client)).rejects.toMatchObject({

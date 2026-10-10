@@ -17,7 +17,7 @@ const ACTIONS: Next[] = [
 ];
 
 /** 알림 상세의 신호 카드. 관리자가 상태를 바꾼다(현장 인력은 RLS로 막힘). */
-export function SignalStatusCard({ clientCode, signal }: { clientCode: string; signal: ClientSignal }) {
+export function SignalStatusCard({ clientCode, signal, seenAt }: { clientCode: string; signal: ClientSignal; seenAt: string }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const resolved = signal.status === "resolved";
@@ -25,7 +25,7 @@ export function SignalStatusCard({ clientCode, signal }: { clientCode: string; s
   function change(next: Next) {
     setError(null);
     startTransition(async () => {
-      const result = await updateSignalStatus({ clientCode, type: signal.type as SignalType, status: next.status, linked: next.linked });
+      const result = await updateSignalStatus({ clientCode, type: signal.type as SignalType, status: next.status, linked: next.linked, seenAt });
       if (!result.ok) setError(result.error);
     });
   }

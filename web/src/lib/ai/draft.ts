@@ -18,7 +18,8 @@ export async function generateDraft(transcript: string, client?: AiClient, subje
   const ai = client ?? defaultAiClient();
   const masked = maskPersonalInfo(transcript).text;
   const label = subject ? clientLabel(subject) : null;
-  const header = label ? `<대상자>${label.title} · ${label.subtitle}</대상자>\n` : "";
+  // 머리말(식별번호·연령대·동)도 가린 뒤 보낸다 — LLM 입력은 모두 마스킹을 거친다
+  const header = label ? `<대상자>${maskPersonalInfo(`${label.title} · ${label.subtitle}`).text}</대상자>\n` : "";
   const { data, model } = await requestStructured(
     ai,
     {
