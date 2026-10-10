@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { ChevronDown, CircleUserRound } from "lucide-react";
 import { Brand } from "@/components/brand";
-import { SidebarNav } from "@/components/sidebar-nav";
+import { NavList, SidebarNav } from "@/components/sidebar-nav";
 import { LogoutButton, SidebarUserInfo } from "@/components/user-info";
-import type { CountKey } from "@/components/manager-nav";
+import { getSidebarCounts } from "@/lib/dashboard/data";
 
 /** PC(lg 이상) 전용 남색 사이드바. 기관 선택은 아직 비활성. */
-export function AppSidebar({ counts }: { counts: Record<CountKey, number> }) {
+export function AppSidebar() {
   return (
     <aside className="hidden w-64 shrink-0 flex-col gap-6 bg-sidebar px-4 py-6 text-sidebar-foreground lg:sticky lg:top-0 lg:flex lg:h-dvh">
       <Brand className="px-2 text-white" />
@@ -19,7 +19,9 @@ export function AppSidebar({ counts }: { counts: Record<CountKey, number> }) {
         <span className="flex-1">광주다움 통합돌봄</span>
         <ChevronDown className="size-4" aria-hidden="true" />
       </button>
-      <SidebarNav counts={counts} />
+      <Suspense fallback={<NavList pathname="" />}>
+        <SidebarNavWithCounts />
+      </Suspense>
       <div className="mt-auto border-t border-sidebar-border pt-4">
         <Suspense fallback={<p className="px-2 text-sm text-sidebar-foreground/60">불러오는 중…</p>}>
           <SidebarUserInfo />
@@ -28,4 +30,9 @@ export function AppSidebar({ counts }: { counts: Record<CountKey, number> }) {
       </div>
     </aside>
   );
+}
+
+// 사이드바 숫자는 세션을 읽으므로 Suspense 안에서 채운다
+async function SidebarNavWithCounts() {
+  return <SidebarNav counts={await getSidebarCounts()} />;
 }

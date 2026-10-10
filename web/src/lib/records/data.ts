@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import type { ClientDisplay } from "@/lib/client-label";
 import { createClient } from "@/lib/supabase/server";
 import { RecordDraftSchema, type RecordDraft } from "@/schemas/record-draft";
 
@@ -20,6 +21,13 @@ export async function getMyClients(): Promise<MyClient[]> {
   const last = new Map<string, string>();
   for (const v of visits ?? []) if (!last.has(v.client_id)) last.set(v.client_id, v.visited_at);
   return (clients ?? []).map((c) => ({ code: c.code, ageBand: c.age_band, dong: c.dong, lastVisitedAt: last.get(c.id) ?? null }));
+}
+
+/** 식별번호로 내가 볼 수 있는 대상자를 찾는다 (RLS). 라우트 핸들러용이라 connection()을 쓰지 않는다. */
+export async function findMyClient(code: string): Promise<ClientDisplay | null> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("clients").select("code, age_band, dong").eq("code", code).maybeSingle();
+  return data ? { code: data.code, ageBand: data.age_band, dong: data.dong } : null;
 }
 
 export type MyRecord = { id: string; clientCode: string; visitedAt: string; final: RecordDraft; edited: boolean };

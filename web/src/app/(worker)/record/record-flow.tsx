@@ -14,6 +14,8 @@ import { saveRecord } from "@/lib/records/actions";
 import { seoulDate } from "@/lib/records/dates";
 import { cn } from "@/lib/utils";
 import { MAX_DURATION_MS, RECORD_FIELDS, SERVICE_TYPES, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
+import { SIGNAL_LABEL, SIGNAL_LEVEL_LABEL, type Signal } from "@/schemas/signal";
+import { ToneBadge } from "@/components/tone-badge";
 
 export type RecordClient = { code: string; ageBand: number | null; dong: string };
 
@@ -56,6 +58,9 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
   const [draft, setDraft] = useState<RecordDraft | null>(null);
   const [final, setFinal] = useState<RecordDraft | null>(null);
   const [draftDate, setDraftDate] = useState("");
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [removed, setRemoved] = useState<Set<number>>(new Set());
+  const [alertDraft, setAlertDraft] = useState("");
   const [saved, setSaved] = useState(false);
 
   async function transcribe(blob: Blob, mimeType: string) {
@@ -98,11 +103,17 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
       const res = await fetch("/api/draft", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript, clientCode }),
       });
-      const data = (await res.json().catch(() => ({}))) as { draft?: RecordDraft; transcript?: string; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        draft?: RecordDraft;
+        signals?: Signal[];
+        alertDraft?: string;
+        transcript?: string;
+        error?: string;
+      };
       if (!res.ok || !data.draft) throw new Error(data.error ?? "draft-failed");
-      openEditor(data.draft, data.transcript ?? transcript);
+      openEditor(data.draft, data.transcript ?? transcript, data.signals ?? [], data.alertDraft ?? "");
     } catch (e) {
       setError(API_ERROR[(e as Error).message] ?? "초안을 만들지 못했어요. 잠시 뒤 다시 시도하거나 직접 작성해 주세요.");
     } finally {
@@ -110,9 +121,12 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
     }
   }
 
-  function openEditor(next: RecordDraft, maskedTranscript: string) {
+  function openEditor(next: RecordDraft, maskedTranscript: string, nextSignals: Signal[] = [], nextAlert = "") {
     markStarted();
     setError(null);
+    setSignals(nextSignals);
+    setRemoved(new Set());
+    setAlertDraft(nextAlert);
     setDraft(next);
     setFinal(next);
     setTranscript(maskedTranscript);
@@ -132,6 +146,8 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
         inputMode: mode,
         sttEngine: mode === "voice" ? sttEngine : null,
         durationMs: startedAt ? Math.min(Date.now() - startedAt, MAX_DURATION_MS) : 0,
+        signals: kept,
+        alertDraft: kept.length > 0 ? alertDraft : "",
       });
       if (result.ok) setSaved(true);
       else setError(result.error);
@@ -149,6 +165,9 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
     setStartedAt(null);
     setDraft(null);
     setFinal(null);
+    setSignals([]);
+    setRemoved(new Set());
+    setAlertDraft("");
     setSaved(false);
     setError(null);
   }
@@ -160,6 +179,7 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
   const target = clients.find((c) => c.code === clientCode) ?? clients[0];
   const label = clientLabel(target);
   const copyText = final ? formatRecordText(final, { clientCode, date: draftDate }) : "";
+  const kept = signals.filter((_, i) => !removed.has(i));
 
   if (saved && final) {
     return (
@@ -167,6 +187,9 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
         <div className="rounded-xl border border-normal/30 bg-normal-soft p-4">
           <p className="font-bold text-normal">저장했어요</p>
           <p className="mt-1 text-sm">{label.title} · {draftDate}</p>
+          {kept.length > 0 && (
+            <p className="mt-1 text-sm">확인이 필요한 신호 {kept.length}건을 동 담당자 화면에 공유했어요.</p>
+          )}
         </div>
         <pre className="rounded-xl border bg-card p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">{copyText}</pre>
         <CopyButton text={copyText} />
@@ -221,6 +244,44 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
             />
           </label>
         ))}
+        {signals.length > 0 && (
+          <section aria-labelledby="signals-heading" className="flex flex-col gap-2 rounded-xl border border-caution/20 bg-caution-soft/60 p-4">
+            <h2 id="signals-heading" className="font-bold text-caution">
+              확인이 필요한 신호
+            </h2>
+            <p className="text-xs text-muted-foreground">AI가 구술에서 찾은 신호예요. 사실과 다르면 빼고 저장해 주세요.</p>
+            <ul className="flex flex-col gap-2">
+              {signals.map((s, i) => {
+                const off = removed.has(i);
+                return (
+                  <li key={`${s.type}-${i}`} className={cn("rounded-lg border bg-card p-3", off && "opacity-50")}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2 font-semibold">
+                        {SIGNAL_LABEL[s.type]}
+                        <ToneBadge tone={s.level === "caution" ? "caution" : "observe"}>{SIGNAL_LEVEL_LABEL[s.level]}</ToneBadge>
+                      </span>
+                      <button
+                        type="button"
+                        className="text-sm text-muted-foreground underline underline-offset-4"
+                        onClick={() =>
+                          setRemoved((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(i)) next.delete(i);
+                            else next.add(i);
+                            return next;
+                          })
+                        }
+                      >
+                        {off ? "다시 넣기" : "빼기"}
+                      </button>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">“{s.evidence_quote}”</p>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
         {error && <p role="alert" className="text-sm text-caution">{error}</p>}
         <div className="grid grid-cols-2 gap-2">
           <CopyButton text={copyText} />

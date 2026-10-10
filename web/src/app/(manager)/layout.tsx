@@ -1,15 +1,12 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { Brand } from "@/components/brand";
-import { DemoBanner } from "@/components/demo-banner";
 import { LogoutButton } from "@/components/user-info";
-import { DEMO_COUNTS } from "@/lib/demo";
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-1 flex-col">
-      <DemoBanner />
       <div className="flex flex-1">
-        <AppSidebar counts={DEMO_COUNTS} />
+        <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex items-center justify-between bg-sidebar px-4 py-3 lg:hidden">
             <Brand className="text-white" />

@@ -1,5 +1,6 @@
 "use server";
 
+import { buildAlertRow, buildFlagRows } from "@/lib/records/flags";
 import { buildRecordRow } from "@/lib/records/row";
 import { createClient } from "@/lib/supabase/server";
 import { SaveRecordSchema } from "@/schemas/record-draft";
@@ -28,6 +29,18 @@ export async function saveRecord(input: unknown): Promise<SaveResult> {
   if (error || !data) {
     console.error(`[save] ${error?.code ?? "unknown"}`); // 기록 내용은 남기지 않는다
     return { ok: false, error: "저장하지 못했습니다. 잠시 뒤 다시 시도해 주세요." };
+  }
+
+  // 신호와 알림 문안 (기록은 이미 저장됨 — 실패하면 기록은 두고 안내만 한다)
+  const flagRows = buildFlagRows(parsed.data.signals, { recordId: data.id, clientId: client.id });
+  if (flagRows.length > 0) {
+    const { data: flags, error: flagError } = await supabase.from("flags").insert(flagRows).select("id");
+    const alertRow = flags?.[0] ? buildAlertRow(flags[0].id, parsed.data.alertDraft) : null;
+    const alertError = alertRow ? (await supabase.from("alert_drafts").insert(alertRow)).error : null;
+    if (flagError || alertError) {
+      console.error(`[save] signals ${flagError?.code ?? alertError?.code ?? "unknown"}`);
+      return { ok: false, error: "기록은 저장했지만 신호를 저장하지 못했어요. 담당자에게 알려 주세요." };
+    }
   }
   return { ok: true, id: data.id, visitedAt: data.visited_at };
 }

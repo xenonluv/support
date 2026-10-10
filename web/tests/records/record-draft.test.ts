@@ -65,6 +65,24 @@ describe("SaveRecordSchema", () => {
     expect(SaveRecordSchema.safeParse({ ...ok, durationMs: 2 * 60 * 60 * 1000 }).success).toBe(true);
   });
 
+  it("확인한 신호와 알림 문안을 함께 받는다 (없으면 빈 값)", () => {
+    const parsed = SaveRecordSchema.parse(ok);
+    expect(parsed.signals).toEqual([]);
+    expect(parsed.alertDraft).toBe("");
+    const withSignal = {
+      ...ok,
+      signals: [{ type: "fall", level: "observe", evidence_quote: "문턱에서 휘청하셨어요" }],
+      alertDraft: "담당자님, 확인이 필요해 공유드립니다.",
+    };
+    expect(SaveRecordSchema.safeParse(withSignal).success).toBe(true);
+  });
+
+  it("신호가 5개를 넘거나 근거가 비정상적으로 길면 거부한다", () => {
+    const signal = { type: "fall", level: "observe", evidence_quote: "휘청하셨어요" };
+    expect(SaveRecordSchema.safeParse({ ...ok, signals: Array(6).fill(signal) }).success).toBe(false);
+    expect(SaveRecordSchema.safeParse({ ...ok, signals: [{ ...signal, evidence_quote: "가".repeat(501) }] }).success).toBe(false);
+  });
+
   it("항목 글자 수가 비정상적으로 길면 거부한다 (서버 부하 방지)", () => {
     expect(SaveRecordSchema.safeParse({ ...ok, final: { ...draft, notes: "가".repeat(2001) } }).success).toBe(false);
     expect(SaveRecordSchema.safeParse({ ...ok, draft: { ...draft, summary: "가".repeat(2001) } }).success).toBe(false);

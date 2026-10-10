@@ -23,6 +23,8 @@ const base: SaveRecordInput = {
   inputMode: "voice",
   sttEngine: "groq/whisper-large-v3-turbo",
   durationMs: 95_000,
+  signals: [],
+  alertDraft: "",
 };
 
 describe("buildRecordRow", () => {

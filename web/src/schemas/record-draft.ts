@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SignalSchema } from "@/schemas/signal";
 
 // 기록 초안 서식 — 단일 출처. 「2026년 노인맞춤돌봄서비스 사업안내」 원문을 받으면 이 파일만 바꾼다.
 
@@ -37,6 +38,8 @@ export const RECORD_FIELDS: { key: TextField; label: string }[] = [
 /** POST /api/draft 입력 */
 export const DraftRequestSchema = z.object({
   transcript: z.string().trim().min(5, "구술 내용이 너무 짧습니다").max(5000, "구술 내용이 너무 깁니다"),
+  /** 알림 문안에 동 이름을 쓰려고 함께 보낸다 (서버가 권한 안에서 다시 찾는다) */
+  clientCode: z.string().regex(/^C-\d{4}$/).optional(),
 });
 
 /** 저장할 때 한 항목의 최대 글자 수 (수정 비율 계산 부하·DB 크기 제한) */
@@ -60,6 +63,9 @@ export const SaveRecordSchema = z.object({
   inputMode: z.enum(["voice", "text"]),
   sttEngine: z.string().max(100).nullable(),
   durationMs: z.number().int().min(0).max(MAX_DURATION_MS),
+  /** 현장 인력이 확인하고 남긴 신호 (뺀 신호는 저장하지 않는다) */
+  signals: z.array(SignalSchema.extend({ evidence_quote: z.string().max(500) })).max(5).default([]),
+  alertDraft: z.string().max(MAX_FIELD_LENGTH).default(""),
 });
 
 export type SaveRecordInput = z.infer<typeof SaveRecordSchema>;

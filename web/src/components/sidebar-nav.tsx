@@ -5,8 +5,13 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { MANAGER_NAV, type CountKey } from "@/components/manager-nav";
 
-export function SidebarNav({ counts }: { counts: Record<CountKey, number> }) {
-  const pathname = usePathname();
+/** 현재 주소로 선택 메뉴를 표시한다. 주소를 읽으므로 반드시 <Suspense> 안에서 쓴다. */
+export function SidebarNav({ counts }: { counts?: Record<CountKey, number> }) {
+  return <NavList counts={counts} pathname={usePathname()} />;
+}
+
+/** 주소를 읽지 않는 메뉴 (불러오는 중 화면용). counts가 없으면 숫자를 비워 둔다. */
+export function NavList({ counts, pathname }: { counts?: Record<CountKey, number>; pathname: string }) {
   return (
     <nav aria-label="관리자 메뉴" className="flex flex-col gap-6">
       {MANAGER_NAV.map((section) => (
@@ -15,7 +20,7 @@ export function SidebarNav({ counts }: { counts: Record<CountKey, number> }) {
           <ul className="mt-2 flex flex-col gap-1">
             {section.items.map((item) => {
               const Icon = item.icon;
-              const count = item.countKey ? counts[item.countKey] : undefined;
+              const count = item.countKey && counts ? counts[item.countKey] : undefined;
               const active = item.href !== undefined && pathname.startsWith(item.href);
               const body = (
                 <>

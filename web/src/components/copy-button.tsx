@@ -8,12 +8,13 @@ import { cn } from "@/lib/utils";
 
 type State = "idle" | "copied" | "failed";
 
-export function CopyButton({ text, className }: { text: string; className?: string }) {
+export function CopyButton({ text, className, onCopied }: { text: string; className?: string; onCopied?: () => void }) {
   const [state, setState] = useState<State>("idle");
 
   async function handleClick() {
     if (await copyText(text)) {
       setState("copied");
+      onCopied?.();
       setTimeout(() => setState("idle"), 2000);
     } else {
       // 실패 안내는 다음 시도 전까지 남겨 둔다

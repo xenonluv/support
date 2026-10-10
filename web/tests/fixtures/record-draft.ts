@@ -13,3 +13,14 @@ export const DRAFT_FIXTURE: RecordDraft = {
   notes: "화장실 문턱에서 1회 휘청거림",
   follow_up: "",
 };
+
+// 기록 + 신호 + 알림 문안을 함께 받는 응답 예시 (7단계)
+export const DRAFT_OUTPUT_FIXTURE = {
+  record: DRAFT_FIXTURE,
+  signals: [
+    { type: "missed_medication", level: "caution", evidence_quote: "고혈압약을 이틀째 안 드셨어요" },
+    // 구술에 없는 근거 — 버려져야 한다
+    { type: "fall", level: "observe", evidence_quote: "계단에서 넘어지셨어요" },
+  ],
+  alert_draft: "화정1동 통합돌봄 담당자님, C-0012 어르신의 복약 누락이 확인되어 공유드립니다.",
+};

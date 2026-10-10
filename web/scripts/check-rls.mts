@@ -93,5 +93,20 @@ if (!own) {
   if (!blocked) await admin.from("visit_records").update({ client_id: own.client_id }).eq("id", own.id); // 원래대로 되돌림
 }
 
+// 6) 신호 상태 변경: 현장 인력은 막히고, 관리자는 된다 (npm run seed:demo 데이터 사용)
+const { data: c12 } = await admin.from("clients").select("id").eq("code", "C-0012").single();
+const { data: flag } = await admin.from("flags").select("id, status").eq("client_id", c12?.id).neq("status", "resolved").limit(1).maybeSingle();
+if (!flag) {
+  check("C-0012에 미해소 신호가 있어야 상태 변경을 시험할 수 있다", false, "없음 — npm run seed:demo 후 다시 실행");
+} else {
+  await workerA.from("flags").update({ status: "checked" }).eq("id", flag.id);
+  const afterWorker = (await admin.from("flags").select("status").eq("id", flag.id).single()).data?.status;
+  check("현장 인력은 신호 상태를 바꿀 수 없다", afterWorker === flag.status, afterWorker ?? "");
+  await managerA.from("flags").update({ status: "checked" }).eq("id", flag.id);
+  const afterManager = (await admin.from("flags").select("status").eq("id", flag.id).single()).data?.status;
+  check("A 관리자는 자기 기관 대상자의 신호 상태를 바꿀 수 있다", afterManager === "checked", afterManager ?? "");
+  await admin.from("flags").update({ status: flag.status }).eq("id", flag.id); // 원래대로
+}
+
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);

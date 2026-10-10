@@ -14,7 +14,8 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "seed": "node --env-file=.env.local scripts/seed.mts",
-    "test:rls": "node --env-file=.env.local scripts/check-rls.mts"
+    "test:rls": "node --env-file=.env.local scripts/check-rls.mts",
+    "seed:demo": "node --env-file=.env.local scripts/seed-demo.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

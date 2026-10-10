@@ -1,6 +1,7 @@
 import { DraftConfigError, DraftRefusedError, generateDraft } from "@/lib/ai/draft";
 import { getAuthUserId } from "@/lib/auth/session";
 import { maskPersonalInfo } from "@/lib/privacy/mask";
+import { findMyClient } from "@/lib/records/data";
 import { isSameOrigin } from "@/lib/stt/upload";
 import { DraftRequestSchema } from "@/schemas/record-draft";
 
@@ -28,8 +29,11 @@ export async function POST(request: Request) {
   const transcript = maskPersonalInfo(parsed.data.transcript).text;
   const started = Date.now();
   try {
-    const { draft, model } = await generateDraft(transcript);
-    return Response.json({ draft, transcript, model, ms: Date.now() - started });
+    const subject = parsed.data.clientCode ? await findMyClient(parsed.data.clientCode) : null;
+    const { draft, signals, alertDraft, model } = subject
+      ? await generateDraft(transcript, undefined, subject)
+      : await generateDraft(transcript);
+    return Response.json({ draft, signals, alertDraft, transcript, model, ms: Date.now() - started });
   } catch (e) {
     if (e instanceof DraftRefusedError) {
       console.error(`[draft] refused (${e.category ?? "unknown"})`);
