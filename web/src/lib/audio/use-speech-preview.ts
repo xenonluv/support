@@ -23,6 +23,8 @@ export function getSpeechRecognition(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
+export type SpeechPhase = "idle" | "listening" | "ended";
+
 /**
  * 말하는 동안 글자를 미리 보여 주는 실시간 인식(보조 기능).
  * 브라우저에 따라 음성이 구글·애플 서버에서 처리될 수 있다.
@@ -30,12 +32,14 @@ export function getSpeechRecognition(): SpeechRecognitionCtor | null {
 export function useSpeechPreview() {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<SpeechPhase>("idle");
   const active = useRef<SpeechRecognitionLike | null>(null);
 
   const start = useCallback(() => {
     const Ctor = getSpeechRecognition();
     if (!Ctor) {
       setError("not-supported");
+      setPhase("ended");
       return;
     }
     const r = new Ctor();
@@ -50,14 +54,17 @@ export function useSpeechPreview() {
     r.onerror = (e) => setError(e.error);
     r.onend = () => {
       if (active.current === r) active.current = null;
+      setPhase("ended");
     };
     setText("");
     setError(null);
     try {
       r.start();
       active.current = r;
+      setPhase("listening");
     } catch {
       setError("start-failed");
+      setPhase("ended");
     }
   }, []);
 
@@ -70,5 +77,5 @@ export function useSpeechPreview() {
     return () => ref.current?.stop();
   }, []);
 
-  return { text, error, start, stop };
+  return { text, error, phase, start, stop };
 }

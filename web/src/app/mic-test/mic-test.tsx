@@ -7,13 +7,24 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { describeBrowser, externalOpenUrl, permissionHelp } from "@/lib/audio/browser";
 import { readAudioEnvironment } from "@/lib/audio/environment";
 import { formatBytes, formatDuration } from "@/lib/audio/format";
-import { buildReport } from "@/lib/audio/report";
+import { buildReport, type SpeechMode } from "@/lib/audio/report";
 import { useRecorder } from "@/lib/audio/use-recorder";
 import { useSpeechPreview } from "@/lib/audio/use-speech-preview";
 import { cn } from "@/lib/utils";
 
 const noSubscribe = () => () => {};
 const serverSnapshot = () => null;
+
+const SPEECH_ERROR_LABEL: Record<string, string> = {
+  "not-allowed": "실시간 글자 권한이 거부됐어요",
+  "service-not-allowed": "이 브라우저에서는 실시간 글자 서비스를 쓸 수 없어요",
+  "audio-capture": "마이크 소리를 받지 못했어요 (녹음 등 다른 기능이 마이크를 쓰는 중일 수 있어요)",
+  "no-speech": "말소리를 듣지 못했어요",
+  network: "인터넷 연결 문제로 인식하지 못했어요",
+  "not-supported": "이 브라우저는 실시간 글자를 지원하지 않아요",
+  "start-failed": "실시간 글자를 시작하지 못했어요",
+  aborted: "실시간 글자가 중간에 멈췄어요",
+};
 
 const PERMISSION_LABEL: Record<PermissionState, string> = {
   granted: "허용됨",
@@ -50,13 +61,14 @@ export function MicTest() {
   const rec = useRecorder();
   const speech = useSpeechPreview();
   const [withSpeech, setWithSpeech] = useState(false);
+  const [speechMode, setSpeechMode] = useState<SpeechMode | null>(null);
   const [playbackOk, setPlaybackOk] = useState<boolean | null>(null);
   const { stop: stopSpeech } = speech;
 
-  // 2분 자동 종료 등으로 녹음이 끝나면 실시간 글자도 멈춘다
+  // 2분 자동 종료 등으로 녹음이 끝나면, 녹음과 함께 켠 실시간 글자도 멈춘다
   useEffect(() => {
-    if (rec.status !== "recording") stopSpeech();
-  }, [rec.status, stopSpeech]);
+    if (speechMode === "with-recording" && rec.status !== "recording") stopSpeech();
+  }, [rec.status, speechMode, stopSpeech]);
 
   if (!env) return <p className="text-sm text-muted-foreground">기기 정보를 확인하는 중…</p>;
 
@@ -66,7 +78,21 @@ export function MicTest() {
   async function handleStart() {
     setPlaybackOk(null);
     const ok = await rec.start();
-    if (ok && withSpeech) speech.start();
+    if (ok && withSpeech) {
+      setSpeechMode("with-recording");
+      speech.start();
+    }
+  }
+
+  const listeningAlone = speechMode === "alone" && speech.phase === "listening";
+
+  function toggleSpeechAlone() {
+    if (listeningAlone) {
+      speech.stop();
+      return;
+    }
+    setSpeechMode("alone");
+    speech.start();
   }
 
   function handleStop() {
@@ -80,8 +106,7 @@ export function MicTest() {
     recording: rec.recording,
     recorderError: rec.errorName,
     playbackOk,
-    speechText: speech.text,
-    speechError: speech.error,
+    speech: { mode: speechMode, textLength: speech.text.length, error: speech.error },
   });
 
   return (
@@ -136,13 +161,30 @@ export function MicTest() {
             </span>
           </span>
         </label>
+        <Button
+          variant="outline"
+          size="lg"
+          className="h-11 w-full text-base"
+          disabled={!env.speechRecognition || recording}
+          onClick={toggleSpeechAlone}
+        >
+          {listeningAlone ? "실시간 글자 그만 듣기" : "실시간 글자만 따로 시험하기 (녹음 없이)"}
+        </Button>
       </div>
 
-      {withSpeech && (speech.text || speech.error) && (
+      {speechMode && speech.phase !== "idle" && (
         <section className="rounded-xl border bg-card p-4">
-          <h2 className="text-sm font-semibold">실시간 글자</h2>
-          <p className="mt-1 min-h-6 text-sm">{speech.text}</p>
-          {speech.error && <p className="mt-1 text-xs text-caution">오류: {speech.error}</p>}
+          <h2 className="text-sm font-semibold">
+            실시간 글자 ({speechMode === "alone" ? "단독" : "녹음과 동시"})
+          </h2>
+          <p className={cn("mt-1 min-h-6 text-sm", !speech.text && "text-muted-foreground")}>
+            {speech.text || (speech.phase === "listening" ? "듣는 중… 말해 보세요" : "인식된 글자가 없어요")}
+          </p>
+          {speech.error && (
+            <p className="mt-1 text-xs text-caution">
+              {SPEECH_ERROR_LABEL[speech.error] ?? "오류가 났어요"} ({speech.error})
+            </p>
+          )}
         </section>
       )}
 
