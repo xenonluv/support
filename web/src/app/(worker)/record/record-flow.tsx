@@ -10,8 +10,8 @@ import { audioFileName } from "@/lib/audio/mime";
 import { formatDuration } from "@/lib/audio/format";
 import { useRecorder } from "@/lib/audio/use-recorder";
 import { clientLabel } from "@/lib/client-label";
-import { saveRecord } from "@/lib/records/actions";
 import { seoulDate } from "@/lib/records/dates";
+import type { SaveResult } from "@/lib/records/save";
 import { cn } from "@/lib/utils";
 import { MAX_DURATION_MS, RECORD_FIELDS, SERVICE_TYPES, formatRecordText, type RecordDraft } from "@/schemas/record-draft";
 import { SIGNAL_LABEL, SIGNAL_LEVEL_LABEL, type Signal } from "@/schemas/signal";
@@ -138,18 +138,23 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
     setBusy("saving");
     setError(null);
     try {
-      const result = await saveRecord({
-        clientCode,
-        transcript,
-        draft,
-        final,
-        inputMode: mode,
-        sttEngine: mode === "voice" ? sttEngine : null,
-        durationMs: startedAt ? Math.min(Date.now() - startedAt, MAX_DURATION_MS) : 0,
-        signals: kept,
-        // AI 알림 문안은 신호 전체를 보고 쓴 글이라, 하나라도 뺐으면 뺀 신호 내용이 남아 있을 수 있어 보내지 않는다
-        alertDraft: kept.length > 0 && removed.size === 0 ? alertDraft : "",
+      const res = await fetch("/api/records", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          clientCode,
+          transcript,
+          draft,
+          final,
+          inputMode: mode,
+          sttEngine: mode === "voice" ? sttEngine : null,
+          durationMs: startedAt ? Math.min(Date.now() - startedAt, MAX_DURATION_MS) : 0,
+          signals: kept,
+          // AI 알림 문안은 신호 전체를 보고 쓴 글이라, 하나라도 뺐으면 뺀 신호 내용이 남아 있을 수 있어 보내지 않는다
+          alertDraft: kept.length > 0 && removed.size === 0 ? alertDraft : "",
+        }),
       });
+      const result = (await res.json()) as SaveResult;
       if (result.ok) {
         setSaved(true);
         setError(result.warning ?? null);

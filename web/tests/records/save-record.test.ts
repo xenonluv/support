@@ -22,7 +22,7 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-const { saveRecord } = await import("@/lib/records/actions");
+const { saveRecord } = await import("@/lib/records/save");
 
 const input = {
   clientCode: "C-0012",

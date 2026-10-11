@@ -36,6 +36,7 @@ export function useRecorder(
   const [elapsedMs, setElapsedMs] = useState(0);
   const [errorName, setErrorName] = useState<string | null>(null);
   const session = useRef<Session | null>(null);
+  const mounted = useRef(true);
   const lastUrl = useRef<string | null>(null);
   const onCompleteRef = useRef(onComplete);
   useEffect(() => {
@@ -76,6 +77,11 @@ export function useRecorder(
       const name = e instanceof DOMException ? e.name : "UnknownError";
       setErrorName(name);
       setStatus(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "error");
+      return false;
+    }
+    // 마이크 허용을 기다리는 사이 화면을 떠났으면 바로 닫는다 (화면 없이 녹음·전송되지 않게)
+    if (!mounted.current) {
+      stream.getTracks().forEach((t) => t.stop());
       return false;
     }
 
@@ -152,7 +158,10 @@ export function useRecorder(
   // 화면을 떠나면(숨김 포함) 진행 중인 녹음은 버리고 마이크를 닫는다. 끝난 녹음의 재생 주소는 그대로 둔다.
   useEffect(() => {
     const sessionRef = session;
+    const mountedRef = mounted;
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       const s = sessionRef.current;
       if (!s) return;
       s.discarded = true;

@@ -1,5 +1,3 @@
-"use server";
-
 import { buildAlertRow, buildFlagRows } from "@/lib/records/flags";
 import { buildRecordRow } from "@/lib/records/row";
 import { createClient } from "@/lib/supabase/server";
@@ -8,7 +6,10 @@ import { SaveRecordSchema } from "@/schemas/record-draft";
 /** warning: 기록은 저장됐지만 신호·알림 문안을 저장하지 못한 경우. 다시 저장하면 기록이 중복되므로 '저장됨'으로 처리한다. */
 export type SaveResult = { ok: true; id: string; visitedAt: string; warning?: string } | { ok: false; error: string };
 
-/** 방문 기록 저장. 로그인 사용자 권한으로 insert하므로 RLS가 본인·내 기관 대상자만 허용한다. */
+/**
+ * 방문 기록 저장 (`POST /api/records`). 로그인 사용자 권한으로 insert하므로 RLS가 본인·내 기관 대상자만 허용한다.
+ * 서버 액션이 아니라 고정 주소로 부른다 — 서버 액션 ID는 배포마다 바뀌어, 열려 있던 기록 화면에서 저장이 영구히 실패하고 고친 초안을 잃는다.
+ */
 export async function saveRecord(input: unknown): Promise<SaveResult> {
   const parsed = SaveRecordSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "입력 내용을 확인해 주세요." };
