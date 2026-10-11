@@ -17,6 +17,7 @@
     "test:rls": "node --env-file=.env.local scripts/check-rls.mts",
     "seed:demo": "node --env-file=.env.local scripts/seed-demo.mts",
     "pilot:accounts": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hooks.mjs scripts/pilot-accounts.mts",
+    "pilot:demo": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hooks.mjs scripts/pilot-demo.mts",
     "metrics": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hooks.mjs scripts/metrics.mts",
     "backup": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hooks.mjs scripts/backup.mts"
   },

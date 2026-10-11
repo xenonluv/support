@@ -26,10 +26,13 @@ export async function readAll<T>(
   }
 }
 
-/** DB 행 → 지표 입력. 시연 데이터(seed-demo)는 뺀다. */
+/** 시연·연습 데이터 표시(stt_engine). seed-demo: 시험 계정 시연, pilot-demo: 파일럿 계정 연습 데이터 */
+export const DEMO_ENGINES = ["seed-demo", "pilot-demo"] as const;
+
+/** DB 행 → 지표 입력. 시연·연습 데이터는 뺀다. */
 export function toMetricRecords(rows: MetricRow[]): MetricRecord[] {
   return rows
-    .filter((r) => r.stt_engine !== "seed-demo")
+    .filter((r) => !(DEMO_ENGINES as readonly (string | null)[]).includes(r.stt_engine))
     .map((r) => ({
       workerId: r.worker_id,
       visitedAt: r.visited_at,

@@ -23,7 +23,7 @@ describe("readAll", () => {
 });
 
 describe("toMetricRecords", () => {
-  it("시연 데이터는 빼고, AI 초안 여부를 붙인다", () => {
+  it("시연·파일럿 연습 데이터는 빼고, AI 초안 여부를 붙인다", () => {
     const draft = { summary: "안부", service_types: [], health: "", medication: "", meals: "", mood: "", living: "", services_provided: "", notes: "", follow_up: "" };
     const empty = { ...draft, summary: "" };
     const base = { worker_id: "w1", visited_at: "2026-10-12T01:00:00Z", edit_ratio: 0, duration_ms: 60_000 };
@@ -32,6 +32,7 @@ describe("toMetricRecords", () => {
         { ...base, draft_json: draft, stt_engine: "whisper-large-v3-turbo" },
         { ...base, draft_json: empty, stt_engine: null, edit_ratio: 1 },
         { ...base, draft_json: draft, stt_engine: "seed-demo" },
+        { ...base, draft_json: draft, stt_engine: "pilot-demo" },
       ]),
     ).toEqual([
       { workerId: "w1", visitedAt: base.visited_at, aiDrafted: true, editRatio: 0, durationMs: 60_000 },
