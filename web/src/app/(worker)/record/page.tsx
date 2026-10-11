@@ -26,7 +26,7 @@ async function RecordLoader({ searchParams }: Pick<PageProps<"/record">, "search
   const initial = pickInitialClient(requested, codes, renamedTo);
   return (
     <RecordFlow
-      clients={clients.map(({ code, ageBand, dong }) => ({ code, ageBand, dong }))}
+      clients={clients}
       initialCode={initial.code}
       notice={initial.notice}
     />

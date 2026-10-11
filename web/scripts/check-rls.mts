@@ -250,5 +250,32 @@ await admin.from("briefings").delete().eq("body", "RLS 검사용"); // 검사용
   }
 }
 
+// 9) 인수인계 읽기(현장 '대상자 상황' 화면): 함께 돌보는 대상자는 다른 기관 기록도 읽고, 맡지 않은 대상자는 못 읽는다
+{
+  const { data: bRow } = await workerB.from("workers").select("agency_id").eq("id", workerBMe.user?.id).single();
+  const shared = await workerB
+    .from("visit_records")
+    .insert({ client_id: c12?.id, worker_id: workerBMe.user?.id, agency_id: bRow?.agency_id, input_mode: "text" })
+    .select("id")
+    .single();
+  try {
+    check("B 현장은 함께 돌보는 C-0012에 기록을 쓴다 (검사 준비)", Boolean(shared.data), shared.error?.code ?? "");
+    const readByA = shared.data ? (await workerA.from("visit_records").select("id").eq("id", shared.data.id)).data ?? [] : [];
+    const agencyByA = (await workerA.from("agencies").select("name").eq("id", bRow?.agency_id)).data ?? [];
+    check("A 현장은 C-0012에 B 기관이 쓴 기록과 그 기관 이름을 읽는다", readByA.length === 1 && agencyByA.length === 1, `기록 ${readByA.length}건, 기관 ${agencyByA.length}곳`);
+    const bName = await workerA.from("workers").select("id").eq("id", workerBMe.user?.id);
+    check("A 현장은 그 기록을 쓴 B 현장의 직원 정보는 읽지 못한다", (bName.data ?? []).length === 0);
+    const hiddenRecords = await workerA.from("visit_records").select("id").eq("client_id", target?.id);
+    const hiddenFlags = await workerA.from("flags").select("id").eq("client_id", target?.id);
+    check(
+      "A 현장은 B 기관만 맡은 C-0063의 기록·신호를 읽지 못한다",
+      (hiddenRecords.data ?? []).length === 0 && (hiddenFlags.data ?? []).length === 0,
+      `기록 ${(hiddenRecords.data ?? []).length}건, 신호 ${(hiddenFlags.data ?? []).length}건`,
+    );
+  } finally {
+    if (shared.data) await admin.from("visit_records").delete().eq("id", shared.data.id); // 검사용 기록 정리
+  }
+}
+
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);

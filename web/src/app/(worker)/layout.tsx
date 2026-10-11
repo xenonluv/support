@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Brand } from "@/components/brand";
 import { HeaderUserName, LogoutButton } from "@/components/user-info";
-import { WorkerTabBar } from "@/components/worker-tab-bar";
+import { TabList, WorkerTabBar } from "@/components/worker-tab-bar";
 
 export default function WorkerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,7 +17,9 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
           </div>
         </header>
         <main className="flex-1 px-4 pt-5 pb-[calc(6rem+env(safe-area-inset-bottom))]">{children}</main>
-        <WorkerTabBar />
+        <Suspense fallback={<TabList pathname="" />}>
+          <WorkerTabBar />
+        </Suspense>
       </div>
     </div>
   );

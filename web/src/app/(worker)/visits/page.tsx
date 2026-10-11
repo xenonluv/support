@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Mic } from "lucide-react";
+import { ClipboardList, Mic } from "lucide-react";
+import { ToneBadge } from "@/components/tone-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { clientLabel } from "@/lib/client-label";
-import { getMyClients } from "@/lib/records/data";
 import { seoulMonthDay } from "@/lib/records/dates";
 import { cn } from "@/lib/utils";
+import { getVisitCards } from "@/lib/visits/data";
 
 export default function VisitsPage() {
   return (
@@ -13,7 +14,7 @@ export default function VisitsPage() {
       <div>
         <h1 className="text-xl font-bold">오늘의 방문</h1>
         <p className="text-sm text-muted-foreground">
-          담당 대상자를 골라 방문 기록을 남기세요 ·{" "}
+          방문 전에 상황을 보고, 다녀와서 기록을 남기세요 ·{" "}
           <Link href="/guide" className="font-medium text-primary underline underline-offset-2">
             사용 안내
           </Link>
@@ -27,7 +28,7 @@ export default function VisitsPage() {
 }
 
 async function ClientList() {
-  const clients = await getMyClients();
+  const clients = await getVisitCards();
   if (clients.length === 0) {
     return <p className="rounded-xl border bg-card p-6 text-center text-sm">담당 대상자가 없습니다. 기관 담당자에게 문의해 주세요.</p>;
   }
@@ -36,15 +37,24 @@ async function ClientList() {
       {clients.map((c) => {
         const label = clientLabel(c);
         return (
-          <li key={c.code} className="rounded-xl border bg-card p-4 shadow-sm">
-            <p className="font-semibold">{label.title}</p>
+          <li key={c.id} className="rounded-xl border bg-card p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-semibold">{label.title}</p>
+              {c.openSignals > 0 && <ToneBadge tone={c.caution ? "caution" : "observe"}>확인 필요 {c.openSignals}</ToneBadge>}
+            </div>
             <p className="text-sm text-muted-foreground">
-              {label.subtitle} · 마지막 기록 {c.lastVisitedAt ? seoulMonthDay(c.lastVisitedAt) : "없음"}
+              {label.subtitle} · {c.lastVisitedAt ? `최근 방문 ${seoulMonthDay(c.lastVisitedAt)}${c.lastByMe ? " (내 기록)" : ""}` : "기록 없음"}
             </p>
-            <Link href={`/record?client=${c.code}`} className={cn(buttonVariants({ size: "lg" }), "mt-3 h-12 w-full text-base")}>
-              <Mic aria-hidden="true" />
-              기록하기
-            </Link>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link href={`/visits/${c.id}`} className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-12 text-base")}>
+                <ClipboardList aria-hidden="true" />
+                상황 보기
+              </Link>
+              <Link href={`/record?client=${c.code}`} className={cn(buttonVariants({ size: "lg" }), "h-12 text-base")}>
+                <Mic aria-hidden="true" />
+                기록하기
+              </Link>
+            </div>
           </li>
         );
       })}

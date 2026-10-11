@@ -36,12 +36,14 @@ describe("decideRoute", () => {
     expect(decideRoute("/clients", worker)).toBe("/visits");
     expect(decideRoute("/clients/new", worker)).toBe("/visits");
     expect(decideRoute("/visits", manager)).toBe("/signals");
+    expect(decideRoute("/visits/0b6f6f2e-1c1a-4f7e-9d43-2b1d5c0e7a10", manager)).toBe("/signals");
     expect(decideRoute("/record", manager)).toBe("/signals");
     expect(decideRoute("/my-records", manager)).toBe("/signals");
   });
 
   it("자기 역할 화면과 공용 화면(마이크 테스트)은 그대로 둔다", () => {
     expect(decideRoute("/visits", worker)).toBeNull();
+    expect(decideRoute("/visits/0b6f6f2e-1c1a-4f7e-9d43-2b1d5c0e7a10", worker)).toBeNull();
     expect(decideRoute("/record", worker)).toBeNull();
     expect(decideRoute("/signals/C-0012", manager)).toBeNull();
     expect(decideRoute("/briefing/C-0012", manager)).toBeNull();

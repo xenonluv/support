@@ -5,22 +5,12 @@ import { RecordDraftSchema, type RecordDraft } from "@/schemas/record-draft";
 
 // 세션을 읽으므로 <Suspense> 안에서만 쓴다. RLS가 내 기관과 연결된 대상자·기록만 돌려준다.
 
-export type MyClient = { code: string; ageBand: number | null; dong: string; lastVisitedAt: string | null };
-
-/** 내 기관과 연결된 대상자와, 내가 마지막으로 기록한 날 */
-export async function getMyClients(): Promise<MyClient[]> {
+/** 기록 화면의 대상자 고르기용: 내 기관과 연결된 대상자 (종결 제외) */
+export async function getMyClients(): Promise<ClientDisplay[]> {
   await connection();
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getClaims();
-  const userId = auth?.claims?.sub;
-  if (!userId) return [];
-  const [{ data: clients }, { data: visits }] = await Promise.all([
-    supabase.from("clients").select("id, code, age_band, dong").is("closed_at", null).order("code"), // 종결한 대상자는 빼고
-    supabase.from("visit_records").select("client_id, visited_at").eq("worker_id", userId).order("visited_at", { ascending: false }),
-  ]);
-  const last = new Map<string, string>();
-  for (const v of visits ?? []) if (!last.has(v.client_id)) last.set(v.client_id, v.visited_at);
-  return (clients ?? []).map((c) => ({ code: c.code, ageBand: c.age_band, dong: c.dong, lastVisitedAt: last.get(c.id) ?? null }));
+  const { data: clients } = await supabase.from("clients").select("code, age_band, dong").is("closed_at", null).order("code"); // 종결한 대상자는 빼고
+  return (clients ?? []).map((c) => ({ code: c.code, ageBand: c.age_band, dong: c.dong }));
 }
 
 /** 식별번호로 내가 볼 수 있는 대상자를 찾는다 (RLS). 라우트 핸들러용이라 connection()을 쓰지 않는다. */

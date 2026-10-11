@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ToneBadge } from "@/components/tone-badge";
+import { SignalSummary } from "@/components/signal-summary";
 import type { ClientSignal } from "@/lib/dashboard/build";
 import { updateSignalStatus } from "@/lib/dashboard/actions";
-import { FLAG_STATUS_LABEL } from "@/lib/status";
 import { cn } from "@/lib/utils";
-import { SIGNAL_LABEL, type SignalType } from "@/schemas/signal";
+import type { SignalType } from "@/schemas/signal";
 
 type Next = { status: "checked" | "acting" | "resolved"; linked?: boolean; label: string };
 const ACTIONS: Next[] = [
@@ -32,17 +31,7 @@ export function SignalStatusCard({ clientCode, signal, seenAt }: { clientCode: s
 
   return (
     <article className={cn("rounded-xl border bg-card p-4", resolved && "opacity-70")}>
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold">{SIGNAL_LABEL[signal.type]}</h3>
-        <span className="flex gap-1.5">
-          <ToneBadge tone="neutral">{FLAG_STATUS_LABEL[signal.status]}</ToneBadge>
-          <ToneBadge tone={resolved ? "normal" : signal.level === "caution" ? "caution" : "observe"}>
-            {resolved ? "해소" : signal.isNew ? "신규" : `${signal.days}일째`}
-          </ToneBadge>
-        </span>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">“{signal.evidence}”</p>
-      {signal.agencyCount > 1 && <p className="mt-1 text-xs font-medium text-caution">{signal.agencyCount}개 기관에서 관찰</p>}
+      <SignalSummary signal={signal} />
       {!resolved && (
         <div className="mt-3 grid grid-cols-2 gap-2">
           {ACTIONS.filter((a) => a.status !== signal.status || a.status === "resolved").map((a) => (
