@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarCheck,
+  ChartColumn,
   ClipboardList,
   Settings,
   Siren,
@@ -36,6 +37,7 @@ export const MANAGER_NAV: NavSection[] = [
     items: [
       { label: "대상자 목록", icon: Users, countKey: "clients" },
       { label: "연계 기관", icon: Building2, countKey: "agencies" },
+      { label: "성과 지표", icon: ChartColumn, href: "/metrics" },
       { label: "설정", icon: Settings },
     ],
   },

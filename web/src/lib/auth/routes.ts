@@ -4,7 +4,7 @@ export type Role = "worker" | "manager";
 export const HOME: Record<Role, string> = { worker: "/visits", manager: "/signals" };
 
 const WORKER_ONLY = ["/visits", "/record", "/my-records"];
-const MANAGER_ONLY = ["/signals", "/briefing"];
+const MANAGER_ONLY = ["/signals", "/briefing", "/metrics"];
 
 /** prefix와 같거나 그 아래 구간인지 (/signals-archive는 /signals 아래가 아님) */
 function under(pathname: string, prefix: string): boolean {
@@ -17,6 +17,8 @@ function under(pathname: string, prefix: string): boolean {
  */
 export function decideRoute(pathname: string, session: { role: Role | null } | null): string | null {
   if (under(pathname, "/api")) return null;
+  // 사용 안내는 로그인 전에도 본다 (첫 접속·인쇄용)
+  if (under(pathname, "/guide")) return null;
   const onLogin = pathname === "/login";
   if (!session || !session.role) return onLogin ? null : "/login";
 

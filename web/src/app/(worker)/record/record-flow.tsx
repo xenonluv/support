@@ -367,7 +367,13 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
             방문 직후 30초 정도 말씀해 주세요. 이름 대신 식별번호로 말하면 더 안전합니다.
           </p>
           {rec.status === "denied" && (
-            <p className="text-center text-sm text-caution">마이크 권한이 꺼져 있어요. 마이크 테스트 화면에서 허용 방법을 확인하세요.</p>
+            <p className="text-center text-sm text-caution">
+              마이크 권한이 꺼져 있어요.{" "}
+              <Link href="/mic-test" className="font-medium underline underline-offset-2">
+                마이크 테스트
+              </Link>
+              에서 허용 방법을 확인하세요.
+            </p>
           )}
         </div>
       )}

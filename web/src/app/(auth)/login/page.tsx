@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Brand } from "@/components/brand";
 import { LoginForm } from "./login-form";
 
@@ -12,7 +13,12 @@ export default function LoginPage() {
         <p className="text-sm text-muted-foreground">방문 직후 30초 구술로 돌봄기록 초안을 만듭니다.</p>
       </div>
       <LoginForm />
-      <p className="text-center text-xs text-muted-foreground">계정은 기관 담당자가 만들어 드립니다.</p>
+      <p className="text-center text-xs text-muted-foreground">
+        계정은 기관 담당자가 만들어 드립니다. ·{" "}
+        <Link href="/guide" className="font-medium text-primary underline underline-offset-2">
+          사용 안내
+        </Link>
+      </p>
     </main>
   );
 }

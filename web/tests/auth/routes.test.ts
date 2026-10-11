@@ -5,6 +5,13 @@ const worker = { role: "worker" } as const;
 const manager = { role: "manager" } as const;
 
 describe("decideRoute", () => {
+  it("사용 안내(/guide)는 로그인 전후 누구나 본다", () => {
+    expect(decideRoute("/guide", null)).toBeNull();
+    expect(decideRoute("/guide", worker)).toBeNull();
+    expect(decideRoute("/guide", manager)).toBeNull();
+    expect(decideRoute("/guide-x", null)).toBe("/login");
+  });
+
   it("비로그인은 로그인 화면으로 보내고, 로그인 화면 자체는 그대로 둔다", () => {
     expect(decideRoute("/visits", null)).toBe("/login");
     expect(decideRoute("/signals/C-0012", null)).toBe("/login");
@@ -25,6 +32,7 @@ describe("decideRoute", () => {
     expect(decideRoute("/signals/C-0012", worker)).toBe("/visits");
     expect(decideRoute("/briefing", worker)).toBe("/visits");
     expect(decideRoute("/briefing/C-0012", worker)).toBe("/visits");
+    expect(decideRoute("/metrics", worker)).toBe("/visits");
     expect(decideRoute("/visits", manager)).toBe("/signals");
     expect(decideRoute("/record", manager)).toBe("/signals");
     expect(decideRoute("/my-records", manager)).toBe("/signals");

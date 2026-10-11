@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 파일럿 설정·발급 결과(참여자 이메일·임시 비밀번호) — 예시 파일만 커밋
+/pilot/*
+!/pilot/pilot.example.json
+# DB 백업(돌봄 기록) — 이 컴퓨터에만 둔다
+/backups/

@@ -1,0 +1,14 @@
+{
+  "agencies": [
+    { "name": "○○동 행정복지센터", "type": "dong_center" },
+    { "name": "○○구 노인맞춤돌봄 수행기관", "type": "provider" }
+  ],
+  "clients": [
+    { "code": "C-1001", "ageBand": 80, "dong": "○○구 ○○동", "agencies": ["○○동 행정복지센터", "○○구 노인맞춤돌봄 수행기관"] },
+    { "code": "C-1002", "ageBand": 70, "dong": "○○구 ○○동", "agencies": ["○○구 노인맞춤돌봄 수행기관"] }
+  ],
+  "workers": [
+    { "email": "worker1@example.com", "name": "생활지원사 1", "role": "worker", "agency": "○○구 노인맞춤돌봄 수행기관" },
+    { "email": "manager1@example.com", "name": "동 담당자 1", "role": "manager", "agency": "○○동 행정복지센터" }
+  ]
+}

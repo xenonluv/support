@@ -12,7 +12,12 @@ export default function VisitsPage() {
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-xl font-bold">오늘의 방문</h1>
-        <p className="text-sm text-muted-foreground">담당 대상자를 골라 방문 기록을 남기세요</p>
+        <p className="text-sm text-muted-foreground">
+          담당 대상자를 골라 방문 기록을 남기세요 ·{" "}
+          <Link href="/guide" className="font-medium text-primary underline underline-offset-2">
+            사용 안내
+          </Link>
+        </p>
       </div>
       <Suspense fallback={<p className="text-sm text-muted-foreground">불러오는 중…</p>}>
         <ClientList />
