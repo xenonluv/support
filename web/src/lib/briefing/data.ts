@@ -124,7 +124,7 @@ export async function getBriefingClients(): Promise<BriefingClientRow[]> {
   const sinceIso = new Date(Date.now() - 14 * DAY_MS).toISOString();
   const supabase = await createClient();
   const [{ data: clients }, { data: visits }, { data: active }] = await Promise.all([
-    supabase.from("clients").select("id, code, age_band, dong").order("code"),
+    supabase.from("clients").select("id, code, age_band, dong").is("closed_at", null).order("code"), // 종결한 대상자는 빼고
     supabase.from("visit_records").select("client_id, agency_id, visited_at").gte("visited_at", sinceIso),
     supabase.from("flags").select("client_id, type").neq("status", "resolved"),
   ]);

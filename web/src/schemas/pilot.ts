@@ -1,17 +1,18 @@
 import { z } from "zod";
+import { AGENCY_TYPES, AgeBandSchema, ClientCodeSchema, DongSchema } from "@/schemas/client";
 
 // 파일럿 계정 발급 설정 (npm run pilot:accounts -- pilot/pilot.json).
 // 대상자는 식별번호·연령대·동만 받는다 — 다른 칸(성명·주소·연락처)이 있으면 거부한다(개인정보 규칙).
 
 const AgencySchema = z.strictObject({
   name: z.string().trim().min(2),
-  type: z.enum(["dong_center", "provider", "welfare_center"]),
+  type: z.enum(AGENCY_TYPES),
 });
 
 const ClientSchema = z.strictObject({
-  code: z.string().regex(/^C-\d{4}$/, "식별번호는 C-숫자4자리"),
-  ageBand: z.number().int().min(50).max(100).multipleOf(10, "연령대는 10 단위 (예: 80)").nullable(),
-  dong: z.string().trim().min(2),
+  code: ClientCodeSchema,
+  ageBand: AgeBandSchema,
+  dong: DongSchema,
   agencies: z.array(z.string()).min(1),
 });
 

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { getMyClients } from "@/lib/records/data";
+import { findRenamedCode, getMyClients } from "@/lib/records/data";
+import { pickInitialClient } from "@/lib/records/initial-client";
 import { RecordFlow } from "./record-flow";
 
 export default function RecordPage({ searchParams }: PageProps<"/record">) {
@@ -18,10 +19,16 @@ export default function RecordPage({ searchParams }: PageProps<"/record">) {
 
 async function RecordLoader({ searchParams }: Pick<PageProps<"/record">, "searchParams">) {
   const [{ client }, clients] = await Promise.all([searchParams, getMyClients()]);
+  const requested = typeof client === "string" ? client : null;
+  const codes = clients.map((c) => c.code);
+  // 예전 링크(번호 변경·종결 전)로 들어오면 지금 번호를 찾거나, 직접 고르게 한다
+  const renamedTo = requested && !codes.includes(requested) ? await findRenamedCode(requested) : null;
+  const initial = pickInitialClient(requested, codes, renamedTo);
   return (
     <RecordFlow
       clients={clients.map(({ code, ageBand, dong }) => ({ code, ageBand, dong }))}
-      initialCode={typeof client === "string" ? client : null}
+      initialCode={initial.code}
+      notice={initial.notice}
     />
   );
 }

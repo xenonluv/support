@@ -64,12 +64,16 @@ export async function getDashboard(days: number): Promise<Dashboard & { asOf: Da
   const sinceIso = new Date(now.getTime() - Math.max(days, LOOKBACK_DAYS) * DAY_MS).toISOString();
   const supabase = await createClient();
   const [{ data: clients }, flags, { data: records }] = await Promise.all([
-    supabase.from("clients").select("id, code, age_band, dong").order("code"),
+    supabase.from("clients").select("id, code, age_band, dong, closed_at").order("code"),
     loadFlags(supabase, sinceIso),
     supabase.from("visit_records").select("client_id, visited_at, flags(id)").gte("visited_at", sinceIso),
   ]);
+  // 종결한 대상자는 빼되, 해소되지 않은 신호가 남아 있으면 해소할 때까지 보여 준다 (위험 신호가 조용히 사라지지 않게)
+  const unresolved = new Set(flags.filter((f) => f.status !== "resolved").map((f) => f.clientId));
   const dash = buildDashboard({
-    clients: (clients ?? []).map((c) => ({ id: c.id, code: c.code, ageBand: c.age_band, dong: c.dong })),
+    clients: (clients ?? [])
+      .filter((c) => !c.closed_at || unresolved.has(c.id))
+      .map((c) => ({ id: c.id, code: c.code, ageBand: c.age_band, dong: c.dong })),
     flags,
     records: (records ?? []).map((r) => ({ clientId: r.client_id, visitedAt: r.visited_at, hasFlags: r.flags.length > 0 })),
     now,
@@ -119,12 +123,12 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
   };
 }
 
-/** 사이드바 숫자: 확인할 신호가 있는 대상자, 대상자, 연계 기관 */
+/** 사이드바 숫자: 확인할 신호가 있는 대상자(종결했어도 신호가 남아 있으면 셈), 대상자(종결 제외), 연계 기관 */
 export async function getSidebarCounts(): Promise<Record<CountKey, number>> {
   await connection();
   const supabase = await createClient();
   const [{ count: clients }, { count: agencies }, { data: active }] = await Promise.all([
-    supabase.from("clients").select("id", { count: "exact", head: true }),
+    supabase.from("clients").select("id", { count: "exact", head: true }).is("closed_at", null),
     supabase.from("agencies").select("id", { count: "exact", head: true }),
     supabase.from("flags").select("client_id").neq("status", "resolved"),
   ]);

@@ -42,26 +42,30 @@ const ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
 const newPassword = () =>
   Array.from({ length: 3 }, () => Array.from({ length: 4 }, () => ALPHABET[randomInt(ALPHABET.length)]).join("")).join("-");
 
-// 2) 기관·대상자·연결
+// 2) 기관·대상자(새 번호만)·연결
 const agencies = await rows(
   "기관",
   admin.from("agencies").upsert(config.agencies, { onConflict: "name" }).select("id, name"),
 );
 const agencyId = (name: string) => agencies.find((a) => a.name === name)!.id as string;
 
-const clients = await rows(
-  "대상자",
-  admin
-    .from("clients")
-    .upsert(
-      config.clients.map((c) => ({ code: c.code, age_band: c.ageBand, dong: c.dong })),
-      { onConflict: "code" },
-    )
-    .select("id, code"),
-);
+// 대상자는 새 번호만 넣는다. 이미 있는 번호·예전에 쓴 번호는 앱(대상자 관리)에서 동 담당자가 관리하므로 건드리지 않는다
+// (덮어쓰면 앱에서 고친 연령대·기관이 되돌아가고, 바뀐 번호가 새 대상자로 다시 생긴다)
+const codes = config.clients.map((c) => c.code);
+const [present, retired] = codes.length
+  ? await Promise.all([
+      rows("대상자", admin.from("clients").select("code").in("code", codes)),
+      rows("번호 이력", admin.from("client_code_history").select("old_code").in("old_code", codes)),
+    ])
+  : [[], []];
+const skip = new Set([...present.map((c) => c.code), ...retired.map((h) => h.old_code)]);
+const fresh = config.clients.filter((c) => !skip.has(c.code));
+const clients = fresh.length
+  ? await rows("대상자", admin.from("clients").insert(fresh.map((c) => ({ code: c.code, age_band: c.ageBand, dong: c.dong }))).select("id, code"))
+  : [];
 const clientId = (code: string) => clients.find((c) => c.code === code)!.id as string;
-const links = config.clients.flatMap((c) => c.agencies.map((a) => ({ client_id: clientId(c.code), agency_id: agencyId(a) })));
-if (links.length) await rows("대상자-기관 연결", admin.from("client_agencies").upsert(links, { onConflict: "client_id,agency_id" }).select("client_id"));
+const links = fresh.flatMap((c) => c.agencies.map((a) => ({ client_id: clientId(c.code), agency_id: agencyId(a) })));
+if (links.length) await rows("대상자-기관 연결", admin.from("client_agencies").insert(links).select("client_id"));
 
 // 3) 참여자 계정 (역할·기관은 비밀 키로만 바꿀 수 있는 app_metadata에 둔다)
 const existing = [];
@@ -97,7 +101,7 @@ for (const w of config.workers) {
 }
 
 // 4) 결과: 비밀번호는 화면에 찍지 않고, git에서 빠지는 파일에만 쓴다
-console.log(`✓ 기관 ${agencies.length}곳, 대상자 ${clients.length}명, 연결 ${links.length}건`);
+console.log(`✓ 기관 ${agencies.length}곳, 대상자 새로 ${clients.length}명 (이미 있거나 예전에 쓴 번호 ${skip.size}개는 그대로), 연결 ${links.length}건`);
 console.log(`✓ 참여자 계정 새로 ${created}명, 갱신 ${updated}명 (모두 파일럿 참여자로 표시)`);
 if (issued.length) {
   const stamp = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 16).replace(/[-:T]/g, ""); // 서울 시각

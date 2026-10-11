@@ -33,6 +33,8 @@ describe("decideRoute", () => {
     expect(decideRoute("/briefing", worker)).toBe("/visits");
     expect(decideRoute("/briefing/C-0012", worker)).toBe("/visits");
     expect(decideRoute("/metrics", worker)).toBe("/visits");
+    expect(decideRoute("/clients", worker)).toBe("/visits");
+    expect(decideRoute("/clients/new", worker)).toBe("/visits");
     expect(decideRoute("/visits", manager)).toBe("/signals");
     expect(decideRoute("/record", manager)).toBe("/signals");
     expect(decideRoute("/my-records", manager)).toBe("/signals");

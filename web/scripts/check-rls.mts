@@ -144,5 +144,111 @@ const seenByA = hidden.data ? (await workerA.from("briefings").select("id").eq("
 check("A 현장은 C-0063 브리핑을 읽을 수 없다", seenByA.length === 0);
 await admin.from("briefings").delete().eq("body", "RLS 검사용"); // 검사용 행 정리
 
+// 8) 대상자 관리: 등록·수정·종결은 동 담당자(동 행정복지센터 관리자)만, 함수로만 한다
+{
+  const agencyOf = async (c: SupabaseClient) => {
+    const { data: u } = await c.auth.getUser();
+    return ((await c.from("workers").select("agency_id").eq("id", u.user?.id).single()).data?.agency_id as string) ?? "";
+  };
+  const agencyA = await agencyOf(managerA);
+  const agencyB = await agencyOf(workerB);
+  const err = (r: { error: { code?: string } | null }) => r.error?.code ?? "성공함";
+
+  // 수행기관(B) 관리자 — 임시 계정 (검사 뒤 삭제)
+  const tempEmail = `rls-provider-${Date.now()}@dolbomieum.kr`;
+  const tempPassword = `Rls-${crypto.randomUUID()}`;
+  const { data: temp } = await admin.auth.admin.createUser({
+    email: tempEmail,
+    password: tempPassword,
+    email_confirm: true,
+    app_metadata: { role: "manager", agency_id: agencyB },
+  });
+  await admin.from("workers").insert({ id: temp.user!.id, agency_id: agencyB, role: "manager", display_name: "RLS 검사 B 관리자" });
+  const providerManager = createClient(url, publishableKey, noSession);
+  await providerManager.auth.signInWithPassword({ email: tempEmail, password: tempPassword });
+
+  let testId: string | null = null;
+  try {
+    const anonReg = await anon.rpc("register_client", { p_code: null, p_age_band: 80, p_dong: "서구 화정1동", p_partner_ids: [] });
+    check("비로그인은 대상자를 등록할 수 없다", Boolean(anonReg.error), err(anonReg));
+    const workerReg = await workerB.rpc("register_client", { p_code: null, p_age_band: 80, p_dong: "서구 화정1동", p_partner_ids: [] });
+    check("현장 인력은 대상자를 등록할 수 없다", workerReg.error?.code === "42501", err(workerReg));
+    const providerReg = await providerManager.rpc("register_client", { p_code: null, p_age_band: 80, p_dong: "서구 화정1동", p_partner_ids: [] });
+    check("동 센터가 아닌 기관의 관리자는 대상자를 등록할 수 없다", providerReg.error?.code === "42501", err(providerReg));
+
+    const reg = await managerA.rpc("register_client", { p_code: null, p_age_band: 80, p_dong: "서구 화정1동", p_partner_ids: [agencyB] });
+    const code = reg.data as string | null;
+    check("동 담당자는 번호 없이 등록하면 다음 번호가 붙는다", typeof code === "string" && /^C-\d{4}$/.test(code), err(reg));
+    testId = code ? ((await admin.from("clients").select("id").eq("code", code).single()).data?.id ?? null) : null;
+    const links = testId ? ((await admin.from("client_agencies").select("agency_id").eq("client_id", testId)).data ?? []).map((l) => l.agency_id).sort() : [];
+    check("등록하면 내 기관과 함께 돌볼 기관이 연결된다", JSON.stringify(links) === JSON.stringify([agencyA, agencyB].sort()), String(links.length));
+    check("함께 돌볼 기관(B) 현장도 새 대상자를 본다", code !== null && (await visibleClientCodes(workerB)).includes(code));
+
+    const update = (c: SupabaseClient, id: string | null, p_code: string, partners: string[]) =>
+      c.rpc("update_client", { p_client_id: id, p_code, p_age_band: 70, p_dong: "서구 화정1동", p_partner_ids: partners });
+    const providerUpd = await update(providerManager, testId, code ?? "", [agencyB]);
+    check("동 센터가 아닌 기관의 관리자는 함께 돌보는 대상자도 고칠 수 없다", providerUpd.error?.code === "42501", err(providerUpd));
+    const workerUpd = await update(workerB, testId, code ?? "", [agencyB]);
+    check("현장 인력은 대상자를 고칠 수 없다", workerUpd.error?.code === "42501", err(workerUpd));
+    const providerClose = await providerManager.rpc("set_client_closed", { p_client_id: testId, p_closed: true });
+    check("동 센터가 아닌 기관의 관리자는 종결할 수 없다", providerClose.error?.code === "42501", err(providerClose));
+
+    // 자동 번호(가장 큰 번호 + 1)를 끌어올리지 않게 낮은 번호로 바꿔 본다
+    const newCode = `C-000${(Date.now() % 9) + 1}`;
+    const upd = await update(managerA, testId, newCode, []);
+    const after = testId ? (await admin.from("clients").select("code, age_band").eq("id", testId).single()).data : null;
+    check("동 담당자는 식별번호·연령대를 고칠 수 있다", !upd.error && after?.code === newCode && after?.age_band === 70, err(upd));
+    const history = testId ? (await workerA.from("client_code_history").select("old_code, new_code").eq("client_id", testId)).data ?? [] : [];
+    check("번호를 바꾸면 이력이 남고, 같은 기관 현장도 이력을 본다", history.length === 1 && history[0].old_code === code && history[0].new_code === newCode, String(history.length));
+    check("기관 연결을 해제하면 B 현장은 더 이상 보지 못한다", !(await visibleClientCodes(workerB)).includes(newCode));
+    const reuse = await managerA.rpc("register_client", { p_code: code, p_age_band: null, p_dong: "서구 화정1동", p_partner_ids: [] });
+    check("예전에 쓴 번호는 다른 대상자에게 다시 줄 수 없다", reuse.error?.code === "23505", err(reuse));
+    if (!reuse.error) await admin.from("clients").delete().eq("code", code!);
+    const taken = await update(managerA, testId, "C-0012", []);
+    check("다른 대상자가 쓰는 번호로 바꿀 수 없다", taken.error?.code === "23505", err(taken));
+    const otherAgency = await update(managerA, target?.id ?? null, "C-0063", []);
+    check("동 담당자도 자기 기관과 연결되지 않은 대상자(C-0063)는 고칠 수 없다", otherAgency.error?.code === "42501", err(otherAgency));
+
+    const close = await managerA.rpc("set_client_closed", { p_client_id: testId, p_closed: true });
+    const closedAt = testId ? (await admin.from("clients").select("closed_at").eq("id", testId).single()).data?.closed_at : null;
+    const reopen = await managerA.rpc("set_client_closed", { p_client_id: testId, p_closed: false });
+    const reopenedAt = testId ? (await admin.from("clients").select("closed_at").eq("id", testId).single()).data?.closed_at : "?";
+    check("동 담당자는 종결하고 다시 진행으로 되돌릴 수 있다", !close.error && Boolean(closedAt) && !reopen.error && reopenedAt === null, err(close));
+
+    const badDong = await managerA.rpc("register_client", { p_code: null, p_age_band: 80, p_dong: "서구 화정1동 운천로 12 010-1234-5678", p_partner_ids: [] });
+    check("동 칸에 주소·전화번호를 섞어 넣으면 거부된다", Boolean(badDong.error), err(badDong));
+    if (badDong.data) await admin.from("clients").delete().eq("code", badDong.data as string);
+
+    // 9999를 쓴 뒤에도 번호 없이 등록할 수 있다 (빈 번호를 찾아 붙인다)
+    const top = await managerA.rpc("register_client", { p_code: "C-9999", p_age_band: null, p_dong: "서구 화정1동", p_partner_ids: [] });
+    const blank = () => managerA.rpc("register_client", { p_code: null, p_age_band: null, p_dong: "서구 화정1동", p_partner_ids: [] });
+    const next1 = await blank();
+    const next2 = await blank();
+    check(
+      "C-9999를 쓴 뒤에도 번호 없이 계속 등록할 수 있다 (빈 번호를 찾아 붙인다)",
+      !top.error && !next1.error && !next2.error && next1.data !== next2.data,
+      `${err(next1)} / ${err(next2)}`,
+    );
+    for (const c of [top.data, next1.data, next2.data]) if (typeof c === "string") await admin.from("clients").delete().eq("code", c);
+
+    const directInsert = await managerA.from("clients").insert({ code: "C-9998", dong: "서구 화정1동" });
+    check("관리자도 대상자 표에 직접 쓸 수는 없다 (함수로만)", directInsert.error?.code === "42501", err(directInsert));
+    if (!directInsert.error) await admin.from("clients").delete().eq("code", "C-9998");
+    const before12 = (await admin.from("clients").select("dong").eq("code", "C-0012").single()).data?.dong;
+    await managerA.from("clients").update({ dong: "RLS 검사" }).eq("code", "C-0012");
+    const after12 = (await admin.from("clients").select("dong").eq("code", "C-0012").single()).data?.dong;
+    check("관리자도 대상자 표를 직접 고칠 수는 없다", after12 === before12, after12 ?? "");
+    if (after12 !== before12) await admin.from("clients").update({ dong: before12 }).eq("code", "C-0012");
+
+    const agencyList = await managerA.rpc("list_agencies");
+    check("관리자는 함께 돌볼 기관 목록을 본다", Array.isArray(agencyList.data) && agencyList.data.some((a: { id: string }) => a.id === agencyB), err(agencyList));
+    const workerList = await workerA.rpc("list_agencies");
+    check("현장 인력은 기관 목록 함수를 쓸 수 없다", Boolean(workerList.error) || (workerList.data ?? []).length === 0, err(workerList));
+  } finally {
+    if (testId) await admin.from("clients").delete().eq("id", testId); // 연결·이력은 함께 지워진다
+    await admin.auth.admin.deleteUser(temp.user!.id); // workers 행도 함께 지워진다
+  }
+}
+
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);

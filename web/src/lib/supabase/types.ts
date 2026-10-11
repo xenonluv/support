@@ -145,9 +145,52 @@ export type Database = {
           },
         ]
       }
+      client_code_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          client_id: string
+          id: string
+          new_code: string
+          old_code: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          client_id: string
+          id?: string
+          new_code: string
+          old_code: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          client_id?: string
+          id?: string
+          new_code?: string
+          old_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_code_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_code_history_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           age_band: number | null
+          closed_at: string | null
           code: string
           created_at: string
           dong: string
@@ -155,6 +198,7 @@ export type Database = {
         }
         Insert: {
           age_band?: number | null
+          closed_at?: string | null
           code: string
           created_at?: string
           dong: string
@@ -162,6 +206,7 @@ export type Database = {
         }
         Update: {
           age_band?: number | null
+          closed_at?: string | null
           code?: string
           created_at?: string
           dong?: string
@@ -350,6 +395,37 @@ export type Database = {
     }
     Functions: {
       keepalive: { Args: never; Returns: string }
+      list_agencies: {
+        Args: never
+        Returns: {
+          id: string
+          name: string
+          type: string
+        }[]
+      }
+      register_client: {
+        Args: {
+          p_age_band: number
+          p_code: string
+          p_dong: string
+          p_partner_ids: string[]
+        }
+        Returns: string
+      }
+      set_client_closed: {
+        Args: { p_client_id: string; p_closed: boolean }
+        Returns: undefined
+      }
+      update_client: {
+        Args: {
+          p_age_band: number
+          p_client_id: string
+          p_code: string
+          p_dong: string
+          p_partner_ids: string[]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

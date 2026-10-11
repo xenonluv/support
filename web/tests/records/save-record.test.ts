@@ -3,15 +3,18 @@ import { DRAFT_FIXTURE } from "../fixtures/record-draft";
 
 // 테이블별 결과를 정해 두는 supabase 흉내. insert 횟수를 센다.
 const inserts: string[] = [];
+const payloads: Record<string, unknown> = {};
 const results: Record<string, { data: unknown; error: unknown }> = {};
 function chain(table: string) {
   const q: Record<string, unknown> = {};
-  for (const m of ["select", "eq"]) q[m] = () => q;
-  q.insert = () => {
+  for (const m of ["select", "eq", "order", "limit"]) q[m] = () => q;
+  q.insert = (payload: unknown) => {
     inserts.push(table);
+    payloads[table] = payload;
     return q;
   };
   q.single = async () => results[table];
+  q.maybeSingle = async () => results[table];
   q.then = (resolve: (v: unknown) => unknown) => Promise.resolve(results[table]).then(resolve);
   return q;
 }
@@ -44,6 +47,7 @@ describe("saveRecord", () => {
     results.visit_records = { data: { id: "record-1", visited_at: "2026-10-11T03:00:00Z" }, error: null };
     results.flags = { data: [{ id: "flag-1" }], error: null };
     results.alert_drafts = { data: null, error: null };
+    results.client_code_history = { data: null, error: null };
   });
 
   it("기록·신호·알림 문안을 저장한다", async () => {
@@ -60,6 +64,19 @@ describe("saveRecord", () => {
   it("알림 문안 저장만 실패해도 마찬가지로 '저장됨' + 경고", async () => {
     results.alert_drafts = { data: null, error: { code: "08006" } };
     expect(await saveRecord(input)).toMatchObject({ ok: true, warning: expect.any(String) });
+  });
+
+  it("기록 화면을 연 사이 식별번호가 바뀌었으면 옛 번호로 대상자를 찾아 저장한다", async () => {
+    results.clients = { data: null, error: null };
+    results.client_code_history = { data: { client_id: "client-12" }, error: null };
+    expect(await saveRecord(input)).toMatchObject({ ok: true, id: "record-1" });
+    expect(payloads.visit_records).toMatchObject({ client_id: "client-12" });
+  });
+
+  it("지금 번호에도 옛 번호에도 없으면 담당 대상자가 아니라고 알린다", async () => {
+    results.clients = { data: null, error: null };
+    expect(await saveRecord(input)).toEqual({ ok: false, error: "담당 대상자가 아닙니다." });
+    expect(inserts).toEqual([]);
   });
 
   it("기록 자체를 저장하지 못하면 실패로 알린다", async () => {

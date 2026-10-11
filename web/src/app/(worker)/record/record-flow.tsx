@@ -45,9 +45,19 @@ const API_ERROR: Record<string, string> = {
 
 const TEXTAREA = "w-full rounded-lg border bg-card p-3 text-base leading-relaxed outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
-export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; initialCode: string | null }) {
+export function RecordFlow({
+  clients,
+  initialCode,
+  notice = null,
+}: {
+  clients: RecordClient[];
+  /** null이면 첫 대상자, 목록에 없는 번호("" 포함)면 아무도 고르지 않는다 — 다른 어르신을 말없이 대신 고르지 않게 */
+  initialCode: string | null;
+  /** 예전 링크로 들어왔을 때 안내 (번호 변경·종결) */
+  notice?: string | null;
+}) {
   const [clientCode, setClientCode] = useState(
-    initialCode && clients.some((c) => c.code === initialCode) ? initialCode : (clients[0]?.code ?? ""),
+    initialCode === null ? (clients[0]?.code ?? "") : clients.some((c) => c.code === initialCode) ? initialCode : "",
   );
   const [mode, setMode] = useState<Mode>("voice");
   const [transcript, setTranscript] = useState("");
@@ -309,6 +319,11 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
 
   return (
     <div className="flex flex-col gap-5">
+      {notice && (
+        <p role="status" className="rounded-lg border border-observe/30 bg-observe-soft p-3 text-sm text-observe">
+          {notice}
+        </p>
+      )}
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         대상자
         <select
@@ -316,6 +331,11 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
           onChange={(e) => setClientCode(e.target.value)}
           className="h-12 rounded-lg border bg-card px-3 text-base"
         >
+          {clientCode === "" && (
+            <option value="" disabled>
+              대상자를 골라 주세요
+            </option>
+          )}
           {clients.map((c) => {
             const l = clientLabel(c);
             return (
@@ -402,14 +422,14 @@ export function RecordFlow({ clients, initialCode }: { clients: RecordClient[]; 
       <Button
         size="lg"
         className="h-12 text-base"
-        disabled={transcript.trim().length < 5 || busy !== null || recording}
+        disabled={!clientCode || transcript.trim().length < 5 || busy !== null || recording}
         onClick={makeDraft}
       >
         {busy === "drafting" ? "초안 만드는 중…" : "기록 초안 만들기"}
       </Button>
       <button
         type="button"
-        disabled={recording || busy !== null}
+        disabled={!clientCode || recording || busy !== null}
         className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-50"
         onClick={() => openEditor(EMPTY_DRAFT, transcript)}
       >

@@ -15,7 +15,7 @@ export async function getMyClients(): Promise<MyClient[]> {
   const userId = auth?.claims?.sub;
   if (!userId) return [];
   const [{ data: clients }, { data: visits }] = await Promise.all([
-    supabase.from("clients").select("id, code, age_band, dong").order("code"),
+    supabase.from("clients").select("id, code, age_band, dong").is("closed_at", null).order("code"), // 종결한 대상자는 빼고
     supabase.from("visit_records").select("client_id, visited_at").eq("worker_id", userId).order("visited_at", { ascending: false }),
   ]);
   const last = new Map<string, string>();
@@ -28,6 +28,20 @@ export async function findMyClient(code: string): Promise<ClientDisplay | null> 
   const supabase = await createClient();
   const { data } = await supabase.from("clients").select("code, age_band, dong").eq("code", code).maybeSingle();
   return data ? { code: data.code, ageBand: data.age_band, dong: data.dong } : null;
+}
+
+/** 옛 식별번호 → 지금 번호 (동 담당자가 번호를 바꾼 경우). 볼 수 있는 대상자만 (RLS) */
+export async function findRenamedCode(oldCode: string): Promise<string | null> {
+  if (!/^C-\d{4}$/.test(oldCode)) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("client_code_history")
+    .select("clients(code)")
+    .eq("old_code", oldCode)
+    .order("changed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data?.clients?.code ?? null;
 }
 
 export type MyRecord = { id: string; clientCode: string; visitedAt: string; final: RecordDraft; edited: boolean };

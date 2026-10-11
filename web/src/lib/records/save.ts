@@ -3,6 +3,22 @@ import { buildRecordRow } from "@/lib/records/row";
 import { createClient } from "@/lib/supabase/server";
 import { SaveRecordSchema } from "@/schemas/record-draft";
 
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+/** 식별번호로 대상자를 찾는다. 기록 화면을 연 사이 동 담당자가 번호를 바꿨으면 옛 번호로도 찾는다(번호는 다시 쓰지 않아 하나로 정해진다). */
+async function findClient(supabase: Supabase, code: string): Promise<{ id: string } | null> {
+  const { data } = await supabase.from("clients").select("id").eq("code", code).maybeSingle();
+  if (data) return data;
+  const { data: moved } = await supabase
+    .from("client_code_history")
+    .select("client_id")
+    .eq("old_code", code)
+    .order("changed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return moved ? { id: moved.client_id } : null;
+}
+
 /** warning: 기록은 저장됐지만 신호·알림 문안을 저장하지 못한 경우. 다시 저장하면 기록이 중복되므로 '저장됨'으로 처리한다. */
 export type SaveResult = { ok: true; id: string; visitedAt: string; warning?: string } | { ok: false; error: string };
 
@@ -19,9 +35,9 @@ export async function saveRecord(input: unknown): Promise<SaveResult> {
   const userId = auth?.claims?.sub;
   if (!userId) return { ok: false, error: "로그인이 필요합니다." };
 
-  const [{ data: me }, { data: client }] = await Promise.all([
+  const [{ data: me }, client] = await Promise.all([
     supabase.from("workers").select("agency_id").eq("id", userId).single(),
-    supabase.from("clients").select("id").eq("code", parsed.data.clientCode).single(),
+    findClient(supabase, parsed.data.clientCode),
   ]);
   if (!me) return { ok: false, error: "직원 정보가 없습니다. 기관 담당자에게 문의해 주세요." };
   if (!client) return { ok: false, error: "담당 대상자가 아닙니다." };

@@ -1,7 +1,7 @@
 // DB 백업: Supabase 무료 요금제는 자동 백업이 없어 직접 내보낸다. 실행: npm run backup
 // - public 테이블 전부와 로그인 계정(id·이메일·역할·기관, 비밀번호 제외)을 JSON으로 web/backups/<서울 시각>/에 쓴다.
 // - 돌봄 기록이 들어 있으므로 git에서 빠지는 폴더에만 두고, 이 컴퓨터 밖으로 옮길 때는 암호화한다.
-// - 복원 순서: auth_users → agencies → clients → client_agencies → workers → visit_records → flags → alert_drafts → briefings
+// - 복원 순서: auth_users → agencies → clients → client_agencies → workers → client_code_history → visit_records → flags → alert_drafts → briefings
 //   (계정은 관리 API createUser에 같은 id로 만들고, 비밀번호는 npm run pilot:accounts -- ... --reset-passwords로 새로 발급)
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
@@ -23,6 +23,7 @@ const TABLES = [
   ["clients", "id"],
   ["client_agencies", "client_id,agency_id"],
   ["workers", "id"],
+  ["client_code_history", "id"], // 식별번호 변경 이력 — 빠지면 옛 번호 저장·번호 재사용 방지가 깨진다
   ["visit_records", "id"],
   ["flags", "id"],
   ["alert_drafts", "id"],
