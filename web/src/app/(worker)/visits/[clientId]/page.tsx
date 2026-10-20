@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mic } from "lucide-react";
 import { AiNotice } from "@/components/ai-notice";
+import { MINE_CARD, MineBadge } from "@/components/mine-mark";
 import { SignalSummary } from "@/components/signal-summary";
-import { ToneBadge } from "@/components/tone-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { clientLabel } from "@/lib/client-label";
 import { seoulDate, seoulMonthDay } from "@/lib/records/dates";
@@ -68,19 +68,14 @@ async function Situation({ params }: Pick<PageProps<"/visits/[clientId]">, "para
                 key={r.id}
                 className={cn(
                   "flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm",
-                  // 왼쪽 색 띠는 테두리 대신 안쪽 그림자로 그려, 내용이 다른 카드와 같은 선에서 시작하게 한다
-                  r.mine && "border-primary/40 bg-accent shadow-[inset_4px_0_0_var(--color-primary)]",
+                  r.mine && MINE_CARD,
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold">
                     {seoulMonthDay(r.visitedAt)} · <span className="font-normal text-muted-foreground">{r.agency}</span>
                   </p>
-                  {r.mine && (
-                    <ToneBadge tone="neutral" className="bg-card text-primary ring-1 ring-primary/30">
-                      내가 쓴 기록
-                    </ToneBadge>
-                  )}
+                  {r.mine && <MineBadge />}
                 </div>
                 <p className="text-sm leading-relaxed">{r.final.summary || "(요약 없음)"}</p>
                 <details className="text-sm">

@@ -9,8 +9,8 @@ export type OpenFlagRow = { clientId: string; type: string; level: string };
 export type VisitCard = VisitClient & {
   /** 누가 다녀왔든 가장 최근 방문. 기록이 없으면 null */
   lastVisitedAt: string | null;
-  /** 가장 최근 방문이 내 기록인지 */
-  lastByMe: boolean;
+  /** 내가 쓴 기록 수(기간 무관) */
+  myRecords: number;
   /** 해소되지 않은 신호 종류 수 */
   openSignals: number;
   /** 해소되지 않은 신호 중 주의 등급이 있는지 */
@@ -20,7 +20,9 @@ export type VisitCard = VisitClient & {
 /** 대상자 순서는 받은 그대로(번호순) 둔다 */
 export function buildVisitCards(clients: VisitClient[], visits: VisitRow[], flags: OpenFlagRow[], userId: string): VisitCard[] {
   const last = new Map<string, VisitRow>();
+  const mine = new Map<string, number>();
   for (const v of visits) {
+    if (v.workerId === userId) mine.set(v.clientId, (mine.get(v.clientId) ?? 0) + 1);
     const prev = last.get(v.clientId);
     if (!prev || Date.parse(v.visitedAt) > Date.parse(prev.visitedAt)) last.set(v.clientId, v);
   }
@@ -36,7 +38,7 @@ export function buildVisitCards(clients: VisitClient[], visits: VisitRow[], flag
     return {
       ...c,
       lastVisitedAt: v?.visitedAt ?? null,
-      lastByMe: v?.workerId === userId,
+      myRecords: mine.get(c.id) ?? 0,
       openSignals: types.get(c.id)?.size ?? 0,
       caution: caution.has(c.id),
     };

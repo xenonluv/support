@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { ClipboardList, Mic } from "lucide-react";
+import { MINE_CARD, MineBadge } from "@/components/mine-mark";
 import { ToneBadge } from "@/components/tone-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { clientLabel } from "@/lib/client-label";
@@ -37,13 +38,22 @@ async function ClientList() {
       {clients.map((c) => {
         const label = clientLabel(c);
         return (
-          <li key={c.id} className="rounded-xl border bg-card p-4 shadow-sm">
+          <li
+            key={c.id}
+            className={cn(
+              "rounded-xl border bg-card p-4 shadow-sm",
+              c.myRecords > 0 && MINE_CARD,
+            )}
+          >
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold">{label.title}</p>
-              {c.openSignals > 0 && <ToneBadge tone={c.caution ? "caution" : "observe"}>확인 필요 {c.openSignals}</ToneBadge>}
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {c.myRecords > 0 && <MineBadge count={c.myRecords} />}
+                {c.openSignals > 0 && <ToneBadge tone={c.caution ? "caution" : "observe"}>확인 필요 {c.openSignals}</ToneBadge>}
+              </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              {label.subtitle} · {c.lastVisitedAt ? `최근 방문 ${seoulMonthDay(c.lastVisitedAt)}${c.lastByMe ? " (내 기록)" : ""}` : "기록 없음"}
+              {label.subtitle} · {c.lastVisitedAt ? `최근 방문 ${seoulMonthDay(c.lastVisitedAt)}` : "기록 없음"}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <Link href={`/visits/${c.id}`} className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-12 text-base")}>
