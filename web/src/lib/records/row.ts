@@ -1,3 +1,4 @@
+import { isDemoEngine } from "@/lib/metrics/rows";
 import { maskPersonalInfo } from "@/lib/privacy/mask";
 import { editRatio } from "@/lib/records/edit-ratio";
 import type { Database } from "@/lib/supabase/types";
@@ -31,7 +32,8 @@ export function buildRecordRow(
     edited: ratio > 0,
     edit_ratio: ratio,
     input_mode: input.inputMode,
-    stt_engine: input.inputMode === "voice" ? input.sttEngine : null,
+    // 시연·연습 표시는 관리 스크립트만 쓴다: 지표에서 빠지고 --clear에 지워지지 않게 실제 기록은 받지 않는다
+    stt_engine: input.inputMode === "voice" && input.sttEngine !== null && !isDemoEngine(input.sttEngine) ? input.sttEngine : null,
     duration_ms: input.durationMs,
   };
 }

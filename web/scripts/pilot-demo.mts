@@ -22,6 +22,13 @@ const MARK = "pilot-demo";
 const STATE_FILE = "pilot/pilot-demo-state.json";
 type State = { filledAt: string; seed: number; clientIds: string[]; ageBands: { clientId: string; ageBand: number }[] };
 
+/** 연령대별로 묶는다 (한 번에 고치려고) */
+function byAgeBand(items: { clientId: string; ageBand: number }[]): Map<number, string[]> {
+  const out = new Map<number, string[]>();
+  for (const a of items) out.set(a.ageBand, [...(out.get(a.ageBand) ?? []), a.clientId]);
+  return out;
+}
+
 const args = process.argv.slice(2);
 const clearOnly = args.includes("--clear");
 const seedArg = args.find((a) => a.startsWith("--seed="));
@@ -56,13 +63,15 @@ async function clear(): Promise<void> {
         admin.from("briefings").delete({ count: "exact" }).in("client_id", state.clientIds).gte("created_at", state.filledAt),
       );
     }
-    for (const a of state.ageBands) {
+    for (const [ageBand, ids] of byAgeBand(state.ageBands)) {
       ages += await run(
         "연령대 되돌리기",
-        admin.from("clients").update({ age_band: null }, { count: "exact" }).eq("id", a.clientId).eq("age_band", a.ageBand),
+        admin.from("clients").update({ age_band: null }, { count: "exact" }).in("id", ids).eq("age_band", ageBand),
       );
     }
     unlinkSync(STATE_FILE);
+  } else if (records > 0) {
+    console.warn(`! ${STATE_FILE}이 없어 채운 뒤 만든 브리핑·채운 연령대는 되돌리지 못했습니다 — 화면에서 직접 확인해 주세요`);
   }
   console.log(`✓ 연습 데이터 삭제: 기록 ${records}건(신호·알림 문안 포함), 브리핑 ${briefings}건, 연령대 되돌림 ${ages}명`);
 }
@@ -149,9 +158,11 @@ try {
   await run("기록", admin.from("visit_records").insert(recordRows));
   if (flagRows.length > 0) await run("신호", admin.from("flags").insert(flagRows));
   if (alertRows.length > 0) await run("알림 문안", admin.from("alert_drafts").insert(alertRows));
-  for (const a of plan.ageBands) {
-    const n = await run("연령대", admin.from("clients").update({ age_band: a.ageBand }, { count: "exact" }).eq("id", a.clientId).is("age_band", null));
-    if (n > 0) state.ageBands.push(a);
+  for (const [ageBand, ids] of byAgeBand(plan.ageBands)) {
+    const filled = await rows("연령대", admin.from("clients").update({ age_band: ageBand }).in("id", ids).is("age_band", null).select("id"));
+    for (const c of filled) state.ageBands.push({ clientId: c.id, ageBand });
+    // 도중에 끊겨도(Ctrl+C) --clear가 되돌릴 수 있게 바로 남긴다
+    writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
   }
 } catch (error) {
   writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));

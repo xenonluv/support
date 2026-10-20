@@ -59,4 +59,9 @@ describe("buildRecordRow", () => {
     expect(row.stt_engine).toBeNull();
     expect(row.transcript_text).toBeNull();
   });
+
+  it("시연·연습 표시(pilot-demo 등)는 STT 엔진으로 받지 않는다 (지표 제외·--clear 삭제 방지)", () => {
+    expect(buildRecordRow({ ...base, sttEngine: "pilot-demo" }, ctx).stt_engine).toBeNull();
+    expect(buildRecordRow({ ...base, sttEngine: "seed-demo" }, ctx).stt_engine).toBeNull();
+  });
 });

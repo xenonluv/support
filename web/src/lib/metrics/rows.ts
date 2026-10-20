@@ -28,11 +28,17 @@ export async function readAll<T>(
 
 /** 시연·연습 데이터 표시(stt_engine). seed-demo: 시험 계정 시연, pilot-demo: 파일럿 계정 연습 데이터 */
 export const DEMO_ENGINES = ["seed-demo", "pilot-demo"] as const;
+const DEMO_ENGINE_SET: ReadonlySet<string | null> = new Set(DEMO_ENGINES);
+
+/** 시연·연습 데이터 표시인지 (실제 저장 경로는 이 값을 받지 않는다) */
+export function isDemoEngine(engine: string | null): boolean {
+  return DEMO_ENGINE_SET.has(engine);
+}
 
 /** DB 행 → 지표 입력. 시연·연습 데이터는 뺀다. */
 export function toMetricRecords(rows: MetricRow[]): MetricRecord[] {
   return rows
-    .filter((r) => !(DEMO_ENGINES as readonly (string | null)[]).includes(r.stt_engine))
+    .filter((r) => !isDemoEngine(r.stt_engine))
     .map((r) => ({
       workerId: r.worker_id,
       visitedAt: r.visited_at,
