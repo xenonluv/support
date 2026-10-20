@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>돌봄이음 중간보고 ep05</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="ep05" data-start="0" data-duration="32.25" data-width="1920" data-height="1080">
+<style>
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Regular.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Medium.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-SemiBold.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Bold.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-ExtraBold.woff2") format("woff2"); font-weight: 800; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #f2f4fa; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #f2f4fa; color: #1b2453;
+  font-family: "Pretendard", sans-serif; word-break: keep-all; }
+.abs { position: absolute; }
+/* 배경: 은은한 점 격자 + 남색·인디고 빛 */
+.bg-dots { position: absolute; inset: 0; background-image: radial-gradient(#c9d0e6 1.6px, transparent 1.6px); background-size: 34px 34px; opacity: 0.55; }
+.bg-glow { position: absolute; border-radius: 50%; filter: blur(10px); }
+.glow-a { width: 1100px; height: 1100px; right: -320px; top: -420px; background: radial-gradient(circle, rgba(79,70,229,0.20), rgba(79,70,229,0) 65%); }
+.glow-b { width: 900px; height: 900px; left: -380px; bottom: -460px; background: radial-gradient(circle, rgba(27,36,83,0.14), rgba(27,36,83,0) 65%); }
+.ghost { position: absolute; font-weight: 800; font-size: 300px; letter-spacing: -0.04em; color: rgba(27,36,83,0.035); white-space: nowrap; }
+/* 자막 */
+.cap { position: absolute; left: 50%; bottom: 30px; width: 1560px; margin-left: -780px; display: flex; justify-content: center; opacity: 0; }
+.cap.stage { left: 690px; width: 1170px; margin-left: 0; }
+.cap.stage span { max-width: 1170px; font-size: 29px; }
+.cap span { display: block; max-width: 1560px; background: rgba(20,27,66,0.92); color: #f6f7ff; font-size: 30px; font-weight: 500;
+  line-height: 1.45; padding: 14px 30px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(20,27,66,0.25); }
+
+.panel { position: absolute; left: 110px; top: 92px; }
+.chiprow { display: flex; gap: 12px; align-items: center; }
+.chip { font-size: 22px; font-weight: 700; padding: 9px 18px; border-radius: 999px; color: #fff; }
+.chip.worker { background: #4f46e5; }
+.chip.manager { background: #1b2453; }
+.chip.no { background: #fff; color: #1b2453; border: 2px solid #d5dbec; }
+.title { margin-top: 26px; font-size: 64px; line-height: 1.16; font-weight: 800; letter-spacing: -0.03em; white-space: pre-line; }
+.subtitle { margin-top: 18px; font-size: 27px; line-height: 1.4; color: #4b5578; font-weight: 500; }
+.rule { margin-top: 30px; height: 4px; width: 120px; background: #4f46e5; border-radius: 4px; transform-origin: left center; }
+.steps { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; align-items: center; gap: 16px; padding: 10px 18px 10px 12px; border-radius: 16px; font-size: 25px; font-weight: 600; color: #586189; position: relative; }
+.step .num { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800; background: #e4e8f4; color: #4b5578; }
+.step .bgfill { position: absolute; inset: 0; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgba(27,36,83,0.10); border: 2px solid #c9cdf7; opacity: 0; }
+.step .num, .step .lbl { position: relative; }
+.step.on .lbl { color: #1b2453; }
+.steps.compact { gap: 6px; }
+.steps.compact .step { padding: 6px 16px 6px 10px; font-size: 23px; }
+.steps.compact .step .num { width: 34px; height: 34px; flex-basis: 34px; font-size: 18px; }
+/* 휴대폰 */
+.phone-wrap { position: absolute; left: 812px; top: 52px; width: 418px; height: 872px; }
+.phone-scale { position: absolute; left: 0; top: 0; width: 418px; height: 872px; transform: scale(0.94); transform-origin: 50% 0; }
+.phone { position: absolute; inset: 0; border-radius: 62px; background: #111633; box-shadow: 0 40px 80px rgba(27,36,83,0.28), 0 0 0 2px #2a3160 inset; }
+.screen { position: absolute; left: 14px; top: 14px; width: 390px; height: 844px; border-radius: 48px; overflow: hidden; background: #f4f5f9; }
+.layer { position: absolute; inset: 0; opacity: 0; }
+.scroller { position: absolute; left: 0; top: 0; width: 390px; }
+.scroller img { display: block; width: 390px; }
+.tabbar { position: absolute; left: 0; bottom: 0; width: 390px; }
+.hlbox { position: absolute; border: 3px solid #4f46e5; border-radius: 14px; box-shadow: 0 0 0 6px rgba(79,70,229,0.18); opacity: 0; }
+.tap { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(79,70,229,0.35); border: 3px solid rgba(79,70,229,0.9); opacity: 0; }
+.punch { position: absolute; left: 50%; top: 10px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #05070f; }
+/* 확대 카드 */
+.lens { position: absolute; left: 1296px; top: 176px; width: 524px; background: #fff; border-radius: 26px; border: 2px solid #d5dbec;
+  box-shadow: 0 30px 60px rgba(27,36,83,0.16); overflow: hidden; opacity: 0; }
+.lens .lhead { display: flex; align-items: center; gap: 10px; padding: 16px 22px; font-size: 21px; font-weight: 700; color: #4f46e5; border-bottom: 2px solid #eef0f8; }
+.lens .lhead i { width: 10px; height: 10px; border-radius: 50%; background: #4f46e5; display: block; }
+.lens .lview { position: relative; overflow: hidden; }
+.lens .lview img { position: absolute; left: 0; top: 0; display: block; }
+/* 안내 카드 */
+.note { position: absolute; width: 524px; background: #1b2453; color: #fff; border-radius: 26px; padding: 34px 36px; opacity: 0; box-shadow: 0 30px 60px rgba(27,36,83,0.25); }
+.note .nicon { width: 64px; height: 64px; border-radius: 18px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; }
+.note .ntitle { margin-top: 22px; font-size: 36px; font-weight: 800; line-height: 1.25; letter-spacing: -0.02em; }
+.note .nbody { margin-top: 14px; font-size: 25px; line-height: 1.5; color: #d9ddf5; font-weight: 500; }
+/* 잠금 화면 */
+.lock { position: absolute; inset: 0; background: radial-gradient(120% 80% at 30% 20%, #4f46e5 0%, #26307a 45%, #121838 100%); color: #fff; }
+.lock .ltime { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 92px; font-weight: 700; letter-spacing: -0.02em; }
+.lock .ldate { position: absolute; left: 0; right: 0; top: 116px; text-align: center; font-size: 22px; font-weight: 600; opacity: 0.85; }
+.notif { position: absolute; left: 14px; top: 300px; width: 362px; border-radius: 26px; background: rgba(250,250,255,0.94); color: #141a3a; padding: 16px 18px; display: flex; gap: 14px; opacity: 0; }
+.notif .appi { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 12px; background: #4f46e5; display: flex; align-items: center; justify-content: center; }
+.notif .nt { font-size: 17px; font-weight: 700; display: flex; justify-content: space-between; }
+.notif .nt em { font-style: normal; font-weight: 500; color: #4f5778; font-size: 15px; }
+.notif .nb { margin-top: 4px; font-size: 17px; line-height: 1.4; font-weight: 500; }
+/* 브라우저 창 */
+.win { position: absolute; left: 690px; top: 96px; width: 1150px; height: 763px; border-radius: 20px; background: #fff; overflow: hidden;
+  box-shadow: 0 40px 90px rgba(27,36,83,0.24), 0 0 0 2px #d5dbec; }
+.chrome { position: absolute; left: 0; top: 0; width: 1150px; height: 44px; background: #e9ecf5; display: flex; align-items: center; padding-left: 20px; gap: 9px; }
+.chrome b { width: 13px; height: 13px; border-radius: 50%; display: block; }
+.url { margin-left: 26px; height: 28px; width: 560px; border-radius: 9px; background: #fff; font-size: 16px; color: #4b5578; display: flex; align-items: center; padding-left: 14px; font-weight: 500; }
+.view { position: absolute; left: 0; top: 44px; width: 1150px; height: 719px; overflow: hidden; background: #f4f5f9; }
+.world { position: absolute; left: 0; top: 0; width: 1440px; transform-origin: 0 0; }
+.world img { display: block; width: 1440px; }
+.mhl { position: absolute; border-radius: 16px; opacity: 0; }
+.cursor { position: absolute; left: 0; top: 0; width: 46px; height: 46px; opacity: 0; }
+.cring { position: absolute; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; border: 4px solid #4f46e5; opacity: 0; }
+/* 작은 휴대폰 (관리자 → 현장 알림) */
+.mini { position: absolute; left: 1560px; top: 300px; width: 300px; height: 610px; border-radius: 46px; background: #111633; opacity: 0; box-shadow: 0 30px 70px rgba(20,27,66,0.35); }
+.mini .mscreen { position: absolute; left: 11px; top: 11px; width: 278px; height: 588px; border-radius: 36px; overflow: hidden; }
+.mini .notif { left: 10px; top: 180px; width: 258px; padding: 12px 13px; gap: 10px; border-radius: 20px; }
+.mini .notif .appi { width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; }
+.mini .notif .nt { font-size: 14px; } .mini .notif .nt em { font-size: 12px; } .mini .notif .nb { font-size: 14px; }
+.mini .ltime { top: 70px; font-size: 64px; } .mini .ldate { top: 48px; font-size: 16px; }
+.mini .mlabel { position: absolute; left: 0; right: 0; bottom: -46px; text-align: center; font-size: 21px; font-weight: 700; color: #1b2453; }
+</style>
+<div class="bg-dots"></div><div class="bg-glow glow-a"></div><div class="bg-glow glow-b"></div>
+  <div class="ghost" data-layout-ignore aria-hidden="true" style="left:60px; bottom:-70px">돌봄이음</div>
+<div class="panel" style="width:540px">
+  <div class="chiprow" id="ep05-chips"><div class="chip manager">관리자 모드</div><div class="chip no">05 / 06</div></div>
+  <div class="title" id="ep05-title">인수인계 브리핑</div>
+  <div class="subtitle" id="ep05-sub">여러 기관의 기록을 한 장으로 요약합니다</div>
+  <div class="rule" id="ep05-rule"></div>
+  <div class="steps"><div class="step" id="ep05-step-0"><div class="bgfill"></div><div class="num">1</div><div class="lbl">담당자 교체 · 사례회의</div></div><div class="step" id="ep05-step-1"><div class="bgfill"></div><div class="num">2</div><div class="lbl">기록과 신호를 한 화면에</div></div><div class="step" id="ep05-step-2"><div class="bgfill"></div><div class="num">3</div><div class="lbl">AI 브리핑 만들기</div></div><div class="step" id="ep05-step-3"><div class="bgfill"></div><div class="num">4</div><div class="lbl">지난 2주를 10초 안팎에</div></div><div class="step" id="ep05-step-4"><div class="bgfill"></div><div class="num">5</div><div class="lbl">초안 · 복사해서 사용</div></div></div>
+</div>
+<div class="win" id="ep05-win"><div class="chrome"><b style="background:#ff5f57"></b><b style="background:#febc2e"></b><b style="background:#28c840"></b></div><div class="url abs" id="ep05-U-m_briefing_list" style="left:100px; top:8px; opacity:0">🔒 dolbomieum.kr/briefing</div><div class="url abs" id="ep05-U-m_briefing_before" style="left:100px; top:8px; opacity:0">🔒 dolbomieum.kr/briefing/C-0012</div><div class="url abs" id="ep05-U-m_briefing_loading" style="left:100px; top:8px; opacity:0">🔒 dolbomieum.kr/briefing/C-0012</div><div class="url abs" id="ep05-U-m_briefing_after" style="left:100px; top:8px; opacity:0">🔒 dolbomieum.kr/briefing/C-0012</div>
+<div class="view"><div class="layer" id="ep05-L-m_briefing_list"><div class="world" id="ep05-W-m_briefing_list" data-layout-allow-overflow><img src="assets/screens/m_briefing_list.png" /><div class="mhl" id="ep05-hl-0" style="left:463px; top:166px; width:766px; height:100px; border:3.24px solid #4f46e5; box-shadow:0 0 0 6.48px rgba(79,70,229,0.16)"></div></div></div>
+<div class="layer" id="ep05-L-m_briefing_before"><div class="world" id="ep05-W-m_briefing_before" data-layout-allow-overflow><img src="assets/screens/m_briefing_before.png" /><div class="mhl" id="ep05-hl-1" style="left:512px; top:345px; width:666px; height:142px; border:3.05px solid #4f46e5; box-shadow:0 0 0 6.11px rgba(79,70,229,0.16)"></div></div></div>
+<div class="layer" id="ep05-L-m_briefing_loading"><div class="world" id="ep05-W-m_briefing_loading" data-layout-allow-overflow><img src="assets/screens/m_briefing_loading.png" /></div></div>
+<div class="layer" id="ep05-L-m_briefing_after"><div class="world" id="ep05-W-m_briefing_after" data-layout-allow-overflow><img src="assets/screens/m_briefing_after.png" /><div class="mhl" id="ep05-hl-2" style="left:512px; top:512px; width:666px; height:160px; border:2.23px solid #4f46e5; box-shadow:0 0 0 4.47px rgba(79,70,229,0.16)"></div><div class="mhl" id="ep05-hl-3" style="left:512px; top:684px; width:666px; height:136px; border:2.49px solid #4f46e5; box-shadow:0 0 0 4.97px rgba(79,70,229,0.16)"></div><div class="mhl" id="ep05-hl-4" style="left:512px; top:1010px; width:666px; height:230px; border:2.23px solid #4f46e5; box-shadow:0 0 0 4.47px rgba(79,70,229,0.16)"></div></div></div></div></div>
+<div class="cring" id="ep05-ring-1-0"></div><div class="cring" id="ep05-ring-2-0"></div>
+<div class="cursor" id="ep05-cursor"><svg width="46" height="46" viewBox="0 0 24 24"><path d="M4 2.5 19.5 12l-6.6 1.6L9.6 20z" fill="#1b2453" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+
+
+<div class="cap stage" id="cap-ep05-0"><span>인수인계 브리핑입니다. 담당자가 바뀌거나 사례회의를 준비할 때 쓰는 기능입니다.</span></div>
+<div class="cap stage" id="cap-ep05-1"><span>어르신을 고르면 기간 안의 모든 기관 기록과, 아직 해결되지 않은 이상징후가 한 화면에 모입니다.</span></div>
+<div class="cap stage" id="cap-ep05-2"><span>브리핑 만들기를 누르면, AI가 기관 구분 없이 기록을 시간순으로 읽고, 그동안 무슨 일이 있었는지 한 장으로 요약합니다.</span></div>
+<div class="cap stage" id="cap-ep05-3"><span>기록을 하나하나 찾아 읽지 않아도, 10초 안팎이면 이 어르신의 지난 2주가 정리됩니다.</span></div>
+<div class="cap stage" id="cap-ep05-4"><span>브리핑 역시 초안이며, 복사해서 사례회의 자료에 붙여 쓸 수 있습니다.</span></div>
+<audio id="vo-ep05-0" src="assets/vo/ep05_00.mp3" data-start="1.4" data-duration="5.1" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep05-1" src="assets/vo/ep05_01.mp3" data-start="7" data-duration="5.7" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep05-2" src="assets/vo/ep05_02.mp3" data-start="13.2" data-duration="6.55" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep05-3" src="assets/vo/ep05_03.mp3" data-start="20.25" data-duration="5.45" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep05-4" src="assets/vo/ep05_04.mp3" data-start="26.2" data-duration="4.45" data-track-index="9" data-volume="1"></audio>
+<script>
+const tl = gsap.timeline({ paused: true });
+tl.fromTo(".glow-a", {scale:1, x:0}, {scale:1.12, x:-40, duration:4, ease:"sine.inOut", yoyo:true, repeat:7}, 0);
+tl.fromTo(".glow-b", {scale:1.1, y:0}, {scale:1, y:-30, duration:4, ease:"sine.inOut", yoyo:true, repeat:7}, 0);
+tl.fromTo(".ghost", {x:0}, {x:-120, duration:32.25, ease:"none"}, 0);
+tl.fromTo("#ep05-chips", {opacity:0, x:-30}, {opacity:1, x:0, duration:0.5, ease:"power3.out"}, 0.15);
+tl.fromTo("#ep05-title", {opacity:0, y:36}, {opacity:1, y:0, duration:0.7, ease:"expo.out"}, 0.3);
+tl.fromTo("#ep05-sub", {opacity:0, y:20}, {opacity:1, y:0, duration:0.6, ease:"power2.out"}, 0.5);
+tl.fromTo("#ep05-rule", {scaleX:0}, {scaleX:1, duration:0.6, ease:"power3.inOut"}, 0.6);
+tl.fromTo("#ep05-step-0", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.75);
+tl.fromTo("#ep05-step-1", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.81);
+tl.fromTo("#ep05-step-2", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.87);
+tl.fromTo("#ep05-step-3", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.93);
+tl.fromTo("#ep05-step-4", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.99);
+tl.to("#ep05-step-0 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 1.25);
+tl.to("#ep05-step-0 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 1.25);
+tl.to("#ep05-step-0 .lbl", {color:"#1b2453", duration:0.35}, 1.25);
+tl.to("#ep05-step-0 .bgfill", {opacity:0, duration:0.3}, 6.85);
+tl.to("#ep05-step-0 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 6.85);
+tl.to("#ep05-step-0 .lbl", {color:"#4b5578", duration:0.3}, 6.85);
+tl.to("#ep05-step-1 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 6.85);
+tl.to("#ep05-step-1 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 6.85);
+tl.to("#ep05-step-1 .lbl", {color:"#1b2453", duration:0.35}, 6.85);
+tl.to("#ep05-step-1 .bgfill", {opacity:0, duration:0.3}, 13.05);
+tl.to("#ep05-step-1 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 13.05);
+tl.to("#ep05-step-1 .lbl", {color:"#4b5578", duration:0.3}, 13.05);
+tl.to("#ep05-step-2 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 13.05);
+tl.to("#ep05-step-2 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 13.05);
+tl.to("#ep05-step-2 .lbl", {color:"#1b2453", duration:0.35}, 13.05);
+tl.to("#ep05-step-2 .bgfill", {opacity:0, duration:0.3}, 20.1);
+tl.to("#ep05-step-2 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 20.1);
+tl.to("#ep05-step-2 .lbl", {color:"#4b5578", duration:0.3}, 20.1);
+tl.to("#ep05-step-3 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 20.1);
+tl.to("#ep05-step-3 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 20.1);
+tl.to("#ep05-step-3 .lbl", {color:"#1b2453", duration:0.35}, 20.1);
+tl.to("#ep05-step-3 .bgfill", {opacity:0, duration:0.3}, 26.05);
+tl.to("#ep05-step-3 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 26.05);
+tl.to("#ep05-step-3 .lbl", {color:"#4b5578", duration:0.3}, 26.05);
+tl.to("#ep05-step-4 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 26.05);
+tl.to("#ep05-step-4 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 26.05);
+tl.to("#ep05-step-4 .lbl", {color:"#1b2453", duration:0.35}, 26.05);
+tl.fromTo("#ep05-win", {opacity:0, y:70, scale:0.97}, {opacity:1, y:0, scale:1, duration:0.9, ease:"power3.out"}, 0.35);
+tl.set("#ep05-L-m_briefing_list", {opacity:1}, 0);
+tl.set("#ep05-U-m_briefing_list", {opacity:1}, 0);
+tl.set("#ep05-W-m_briefing_list", {x:0, y:0, scale:0.79861}, 0);
+tl.set("#ep05-W-m_briefing_before", {x:0, y:0, scale:0.79861}, 0);
+tl.set("#ep05-W-m_briefing_loading", {x:0, y:0, scale:0.79861}, 0);
+tl.set("#ep05-W-m_briefing_after", {x:0, y:0, scale:0.79861}, 0);
+tl.to("#ep05-W-m_briefing_list", {x:-279, y:0, scale:1.081, duration:1.2, ease:"power3.inOut"}, 1.4);
+tl.fromTo("#ep05-hl-0", {opacity:0}, {opacity:1, duration:0.4, ease:"power2.out", immediateRender:false}, 2.3);
+tl.set("#ep05-cursor", {x:1880, y:1000}, 6.59);
+tl.to("#ep05-cursor", {opacity:1, duration:0.2}, 6.6);
+tl.to("#ep05-cursor", {x:1320, y:369, duration:0.6, ease:"power3.inOut"}, 6.6);
+tl.to("#ep05-cursor", {scale:0.82, duration:0.1, ease:"power2.in", yoyo:true, repeat:1}, 7.2);
+tl.set("#ep05-ring-1-0", {left:1326, top:373}, 0);
+tl.fromTo("#ep05-ring-1-0", {opacity:0.9, scale:0.3}, {opacity:0, scale:1.8, duration:0.6, ease:"power2.out", immediateRender:false}, 7.25);
+tl.to("#ep05-cursor", {opacity:0, duration:0.3}, 7.9);
+tl.to("#ep05-L-m_briefing_list", {opacity:0, duration:0.35, ease:"power1.in"}, 7.5);
+tl.to("#ep05-U-m_briefing_list", {opacity:0, duration:0.2}, 7.5);
+tl.fromTo("#ep05-L-m_briefing_before", {opacity:0, y:24}, {opacity:1, y:0, duration:0.45, ease:"power2.out", immediateRender:false}, 7.6);
+tl.to("#ep05-U-m_briefing_before", {opacity:1, duration:0.2}, 7.6);
+tl.to("#ep05-W-m_briefing_before", {x:-393, y:-43, scale:1.146, duration:1.2, ease:"power3.inOut"}, 8.05);
+tl.to("#ep05-hl-0", {opacity:0, duration:0.25}, 6.9);
+tl.fromTo("#ep05-hl-1", {opacity:0}, {opacity:1, duration:0.4, ease:"power2.out", immediateRender:false}, 8.95);
+tl.to("#ep05-cursor", {opacity:1, duration:0.2}, 12.8);
+tl.to("#ep05-cursor", {x:1259, y:791, duration:1, ease:"power3.inOut"}, 12.8);
+tl.to("#ep05-cursor", {scale:0.82, duration:0.1, ease:"power2.in", yoyo:true, repeat:1}, 13.8);
+tl.set("#ep05-ring-2-0", {left:1265, top:795}, 0);
+tl.fromTo("#ep05-ring-2-0", {opacity:0.9, scale:0.3}, {opacity:0, scale:1.8, duration:0.6, ease:"power2.out", immediateRender:false}, 13.85);
+tl.to("#ep05-cursor", {opacity:0, duration:0.3}, 14.5);
+tl.to("#ep05-L-m_briefing_before", {opacity:0, duration:0.35, ease:"power1.in"}, 14.1);
+tl.to("#ep05-U-m_briefing_before", {opacity:0, duration:0.2}, 14.1);
+tl.fromTo("#ep05-L-m_briefing_loading", {opacity:0, y:24}, {opacity:1, y:0, duration:0.45, ease:"power2.out", immediateRender:false}, 14.2);
+tl.to("#ep05-U-m_briefing_loading", {opacity:1, duration:0.2}, 14.2);
+tl.to("#ep05-L-m_briefing_loading", {opacity:0, duration:0.35, ease:"power1.in"}, 15.7);
+tl.to("#ep05-U-m_briefing_loading", {opacity:0, duration:0.2}, 15.7);
+tl.fromTo("#ep05-L-m_briefing_after", {opacity:0, y:24}, {opacity:1, y:0, duration:0.45, ease:"power2.out", immediateRender:false}, 15.8);
+tl.to("#ep05-U-m_briefing_after", {opacity:1, duration:0.2}, 15.8);
+tl.to("#ep05-W-m_briefing_after", {x:-749, y:-682, scale:1.567, duration:1.2, ease:"power3.inOut"}, 16.25);
+tl.to("#ep05-hl-1", {opacity:0, duration:0.25}, 13.1);
+tl.fromTo("#ep05-hl-2", {opacity:0}, {opacity:1, duration:0.4, ease:"power2.out", immediateRender:false}, 17.15);
+tl.to("#ep05-W-m_briefing_after", {x:-615, y:-930, scale:1.408, duration:1.2, ease:"power3.inOut"}, 20.25);
+tl.to("#ep05-hl-2", {opacity:0, duration:0.25}, 20.15);
+tl.fromTo("#ep05-hl-3", {opacity:0}, {opacity:1, duration:0.4, ease:"power2.out", immediateRender:false}, 21.15);
+tl.to("#ep05-W-m_briefing_after", {x:-749, y:-1376, scale:1.567, duration:1.2, ease:"power3.inOut"}, 26.2);
+tl.to("#ep05-hl-3", {opacity:0, duration:0.25}, 26.1);
+tl.fromTo("#ep05-hl-4", {opacity:0}, {opacity:1, duration:0.4, ease:"power2.out", immediateRender:false}, 27.1);
+tl.fromTo("#cap-ep05-0", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 1.3);
+tl.to("#cap-ep05-0", {opacity:0, duration:0.25, ease:"power1.in"}, 6.65);
+tl.fromTo("#cap-ep05-1", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 6.9);
+tl.to("#cap-ep05-1", {opacity:0, duration:0.25, ease:"power1.in"}, 12.85);
+tl.fromTo("#cap-ep05-2", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 13.1);
+tl.to("#cap-ep05-2", {opacity:0, duration:0.25, ease:"power1.in"}, 19.9);
+tl.fromTo("#cap-ep05-3", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 20.15);
+tl.to("#cap-ep05-3", {opacity:0, duration:0.25, ease:"power1.in"}, 25.85);
+tl.fromTo("#cap-ep05-4", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 26.1);
+tl.to("#cap-ep05-4", {opacity:0, duration:0.25, ease:"power1.in"}, 30.8);
+window.__timelines["ep05"] = tl;
+</script>
+</div>
+</body>
+</html>

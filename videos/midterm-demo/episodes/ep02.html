@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>돌봄이음 중간보고 ep02</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+</head>
+<body>
+<div id="root" data-composition-id="ep02" data-start="0" data-duration="48.5" data-width="1920" data-height="1080">
+<style>
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Regular.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Medium.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-SemiBold.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-Bold.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Pretendard"; src: url("assets/fonts/Pretendard-ExtraBold.woff2") format("woff2"); font-weight: 800; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #f2f4fa; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #f2f4fa; color: #1b2453;
+  font-family: "Pretendard", sans-serif; word-break: keep-all; }
+.abs { position: absolute; }
+/* 배경: 은은한 점 격자 + 남색·인디고 빛 */
+.bg-dots { position: absolute; inset: 0; background-image: radial-gradient(#c9d0e6 1.6px, transparent 1.6px); background-size: 34px 34px; opacity: 0.55; }
+.bg-glow { position: absolute; border-radius: 50%; filter: blur(10px); }
+.glow-a { width: 1100px; height: 1100px; right: -320px; top: -420px; background: radial-gradient(circle, rgba(79,70,229,0.20), rgba(79,70,229,0) 65%); }
+.glow-b { width: 900px; height: 900px; left: -380px; bottom: -460px; background: radial-gradient(circle, rgba(27,36,83,0.14), rgba(27,36,83,0) 65%); }
+.ghost { position: absolute; font-weight: 800; font-size: 300px; letter-spacing: -0.04em; color: rgba(27,36,83,0.035); white-space: nowrap; }
+/* 자막 */
+.cap { position: absolute; left: 50%; bottom: 30px; width: 1560px; margin-left: -780px; display: flex; justify-content: center; opacity: 0; }
+.cap.stage { left: 690px; width: 1170px; margin-left: 0; }
+.cap.stage span { max-width: 1170px; font-size: 29px; }
+.cap span { display: block; max-width: 1560px; background: rgba(20,27,66,0.92); color: #f6f7ff; font-size: 30px; font-weight: 500;
+  line-height: 1.45; padding: 14px 30px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(20,27,66,0.25); }
+
+.panel { position: absolute; left: 110px; top: 92px; }
+.chiprow { display: flex; gap: 12px; align-items: center; }
+.chip { font-size: 22px; font-weight: 700; padding: 9px 18px; border-radius: 999px; color: #fff; }
+.chip.worker { background: #4f46e5; }
+.chip.manager { background: #1b2453; }
+.chip.no { background: #fff; color: #1b2453; border: 2px solid #d5dbec; }
+.title { margin-top: 26px; font-size: 64px; line-height: 1.16; font-weight: 800; letter-spacing: -0.03em; white-space: pre-line; }
+.subtitle { margin-top: 18px; font-size: 27px; line-height: 1.4; color: #4b5578; font-weight: 500; }
+.rule { margin-top: 30px; height: 4px; width: 120px; background: #4f46e5; border-radius: 4px; transform-origin: left center; }
+.steps { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; align-items: center; gap: 16px; padding: 10px 18px 10px 12px; border-radius: 16px; font-size: 25px; font-weight: 600; color: #586189; position: relative; }
+.step .num { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800; background: #e4e8f4; color: #4b5578; }
+.step .bgfill { position: absolute; inset: 0; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgba(27,36,83,0.10); border: 2px solid #c9cdf7; opacity: 0; }
+.step .num, .step .lbl { position: relative; }
+.step.on .lbl { color: #1b2453; }
+.steps.compact { gap: 6px; }
+.steps.compact .step { padding: 6px 16px 6px 10px; font-size: 23px; }
+.steps.compact .step .num { width: 34px; height: 34px; flex-basis: 34px; font-size: 18px; }
+/* 휴대폰 */
+.phone-wrap { position: absolute; left: 812px; top: 52px; width: 418px; height: 872px; }
+.phone-scale { position: absolute; left: 0; top: 0; width: 418px; height: 872px; transform: scale(0.94); transform-origin: 50% 0; }
+.phone { position: absolute; inset: 0; border-radius: 62px; background: #111633; box-shadow: 0 40px 80px rgba(27,36,83,0.28), 0 0 0 2px #2a3160 inset; }
+.screen { position: absolute; left: 14px; top: 14px; width: 390px; height: 844px; border-radius: 48px; overflow: hidden; background: #f4f5f9; }
+.layer { position: absolute; inset: 0; opacity: 0; }
+.scroller { position: absolute; left: 0; top: 0; width: 390px; }
+.scroller img { display: block; width: 390px; }
+.tabbar { position: absolute; left: 0; bottom: 0; width: 390px; }
+.hlbox { position: absolute; border: 3px solid #4f46e5; border-radius: 14px; box-shadow: 0 0 0 6px rgba(79,70,229,0.18); opacity: 0; }
+.tap { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(79,70,229,0.35); border: 3px solid rgba(79,70,229,0.9); opacity: 0; }
+.punch { position: absolute; left: 50%; top: 10px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #05070f; }
+/* 확대 카드 */
+.lens { position: absolute; left: 1296px; top: 176px; width: 524px; background: #fff; border-radius: 26px; border: 2px solid #d5dbec;
+  box-shadow: 0 30px 60px rgba(27,36,83,0.16); overflow: hidden; opacity: 0; }
+.lens .lhead { display: flex; align-items: center; gap: 10px; padding: 16px 22px; font-size: 21px; font-weight: 700; color: #4f46e5; border-bottom: 2px solid #eef0f8; }
+.lens .lhead i { width: 10px; height: 10px; border-radius: 50%; background: #4f46e5; display: block; }
+.lens .lview { position: relative; overflow: hidden; }
+.lens .lview img { position: absolute; left: 0; top: 0; display: block; }
+/* 안내 카드 */
+.note { position: absolute; width: 524px; background: #1b2453; color: #fff; border-radius: 26px; padding: 34px 36px; opacity: 0; box-shadow: 0 30px 60px rgba(27,36,83,0.25); }
+.note .nicon { width: 64px; height: 64px; border-radius: 18px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; }
+.note .ntitle { margin-top: 22px; font-size: 36px; font-weight: 800; line-height: 1.25; letter-spacing: -0.02em; }
+.note .nbody { margin-top: 14px; font-size: 25px; line-height: 1.5; color: #d9ddf5; font-weight: 500; }
+/* 잠금 화면 */
+.lock { position: absolute; inset: 0; background: radial-gradient(120% 80% at 30% 20%, #4f46e5 0%, #26307a 45%, #121838 100%); color: #fff; }
+.lock .ltime { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 92px; font-weight: 700; letter-spacing: -0.02em; }
+.lock .ldate { position: absolute; left: 0; right: 0; top: 116px; text-align: center; font-size: 22px; font-weight: 600; opacity: 0.85; }
+.notif { position: absolute; left: 14px; top: 300px; width: 362px; border-radius: 26px; background: rgba(250,250,255,0.94); color: #141a3a; padding: 16px 18px; display: flex; gap: 14px; opacity: 0; }
+.notif .appi { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 12px; background: #4f46e5; display: flex; align-items: center; justify-content: center; }
+.notif .nt { font-size: 17px; font-weight: 700; display: flex; justify-content: space-between; }
+.notif .nt em { font-style: normal; font-weight: 500; color: #4f5778; font-size: 15px; }
+.notif .nb { margin-top: 4px; font-size: 17px; line-height: 1.4; font-weight: 500; }
+/* 브라우저 창 */
+.win { position: absolute; left: 690px; top: 96px; width: 1150px; height: 763px; border-radius: 20px; background: #fff; overflow: hidden;
+  box-shadow: 0 40px 90px rgba(27,36,83,0.24), 0 0 0 2px #d5dbec; }
+.chrome { position: absolute; left: 0; top: 0; width: 1150px; height: 44px; background: #e9ecf5; display: flex; align-items: center; padding-left: 20px; gap: 9px; }
+.chrome b { width: 13px; height: 13px; border-radius: 50%; display: block; }
+.url { margin-left: 26px; height: 28px; width: 560px; border-radius: 9px; background: #fff; font-size: 16px; color: #4b5578; display: flex; align-items: center; padding-left: 14px; font-weight: 500; }
+.view { position: absolute; left: 0; top: 44px; width: 1150px; height: 719px; overflow: hidden; background: #f4f5f9; }
+.world { position: absolute; left: 0; top: 0; width: 1440px; transform-origin: 0 0; }
+.world img { display: block; width: 1440px; }
+.mhl { position: absolute; border-radius: 16px; opacity: 0; }
+.cursor { position: absolute; left: 0; top: 0; width: 46px; height: 46px; opacity: 0; }
+.cring { position: absolute; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; border: 4px solid #4f46e5; opacity: 0; }
+/* 작은 휴대폰 (관리자 → 현장 알림) */
+.mini { position: absolute; left: 1560px; top: 300px; width: 300px; height: 610px; border-radius: 46px; background: #111633; opacity: 0; box-shadow: 0 30px 70px rgba(20,27,66,0.35); }
+.mini .mscreen { position: absolute; left: 11px; top: 11px; width: 278px; height: 588px; border-radius: 36px; overflow: hidden; }
+.mini .notif { left: 10px; top: 180px; width: 258px; padding: 12px 13px; gap: 10px; border-radius: 20px; }
+.mini .notif .appi { width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; }
+.mini .notif .nt { font-size: 14px; } .mini .notif .nt em { font-size: 12px; } .mini .notif .nb { font-size: 14px; }
+.mini .ltime { top: 70px; font-size: 64px; } .mini .ldate { top: 48px; font-size: 16px; }
+.mini .mlabel { position: absolute; left: 0; right: 0; bottom: -46px; text-align: center; font-size: 21px; font-weight: 700; color: #1b2453; }
+</style>
+<div class="bg-dots"></div><div class="bg-glow glow-a"></div><div class="bg-glow glow-b"></div>
+  <div class="ghost" data-layout-ignore aria-hidden="true" style="left:60px; bottom:-70px">돌봄이음</div>
+<div class="panel" style="width:640px">
+  <div class="chiprow" id="ep02-chips"><div class="chip worker">현장인력 모드</div><div class="chip no">02 / 06</div></div>
+  <div class="title" id="ep02-title">30초 구술로
+기록 초안 만들기</div>
+  <div class="subtitle" id="ep02-sub">말하면 AI가 규격 기록 초안을 만듭니다</div>
+  <div class="rule" id="ep02-rule"></div>
+  <div class="steps compact"><div class="step" id="ep02-step-0"><div class="bgfill"></div><div class="num">1</div><div class="lbl">기록하기</div></div><div class="step" id="ep02-step-1"><div class="bgfill"></div><div class="num">2</div><div class="lbl">녹음 시작 · 30초 구술</div></div><div class="step" id="ep02-step-2"><div class="bgfill"></div><div class="num">3</div><div class="lbl">음성 → 글자 (원본 미저장)</div></div><div class="step" id="ep02-step-3"><div class="bgfill"></div><div class="num">4</div><div class="lbl">기록 항목별 초안</div></div><div class="step" id="ep02-step-4"><div class="bgfill"></div><div class="num">5</div><div class="lbl">위험 신호와 근거 문장</div></div><div class="step" id="ep02-step-5"><div class="bgfill"></div><div class="num">6</div><div class="lbl">저장 · 공유 · 복사</div></div><div class="step" id="ep02-step-6"><div class="bgfill"></div><div class="num">7</div><div class="lbl">결과는 모두 초안</div></div></div>
+</div>
+<div class="phone-wrap" id="ep02-phone"><div class="phone-scale"><div class="phone"><div class="screen">
+<div class="layer" id="ep02-L-w_visits"><div class="scroller" id="ep02-S-w_visits" data-layout-allow-overflow><img src="assets/screens/w_visits.png" /></div></div>
+<div class="layer" id="ep02-L-w_record_initial"><div class="scroller" id="ep02-S-w_record_initial" data-layout-allow-overflow><img src="assets/screens/w_record_initial.png" /><div class="hlbox" id="ep02-hl-0" style="left:12px; top:140px; width:366px; height:150px"></div></div></div>
+<div class="layer" id="ep02-L-w_record_recording"><div class="scroller" id="ep02-S-w_record_recording" data-layout-allow-overflow><img src="assets/screens/w_record_recording.png" /><div class="hlbox" id="ep02-hl-1" style="left:80px; top:298px; width:230px; height:176px"></div></div></div>
+<div class="layer" id="ep02-L-w_record_transcript"><div class="scroller" id="ep02-S-w_record_transcript" data-layout-allow-overflow><img src="assets/screens/w_record_transcript.png" /><div class="hlbox" id="ep02-hl-2" style="left:12px; top:398px; width:366px; height:214px"></div></div></div>
+<div class="layer" id="ep02-L-w_record_draft_full"><div class="scroller" id="ep02-S-w_record_draft_full" data-layout-allow-overflow><img src="assets/screens/w_record_draft_full.png" /><div class="hlbox" id="ep02-hl-3" style="left:12px; top:262px; width:366px; height:420px"></div><div class="hlbox" id="ep02-hl-4" style="left:12px; top:1566px; width:366px; height:340px"></div></div><img class="tabbar" src="assets/screens/w_tabbar.png" /></div>
+<div class="layer" id="ep02-L-w_record_saved_full"><div class="scroller" id="ep02-S-w_record_saved_full" data-layout-allow-overflow><img src="assets/screens/w_record_saved_full.png" /><div class="hlbox" id="ep02-hl-5" style="left:12px; top:140px; width:366px; height:420px"></div></div><img class="tabbar" src="assets/screens/w_tabbar.png" /></div>
+<div class="tap" id="ep02-tap-0-0" style="left:278px; top:459px"></div><div class="tap" id="ep02-tap-1-0" style="left:195px; top:386px"></div><div class="tap" id="ep02-tap-2-0" style="left:195px; top:386px"></div><div class="tap" id="ep02-tap-3-0" style="left:195px; top:655px"></div><div class="tap" id="ep02-tap-5-0" style="left:293px; top:697px"></div>
+</div><div class="punch"></div></div></div></div>
+<div class="lens" id="ep02-lens-0" style="top:335px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:213px"><img data-layout-allow-overflow src="assets/screens/w_record_initial.png" style="width:554.1px; left:-17.05px; top:-198.91px" /></div></div><div class="lens" id="ep02-lens-1" style="top:242px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:398px"><img data-layout-allow-overflow src="assets/screens/w_record_recording.png" style="width:881.74px; left:-180.87px; top:-673.74px" /></div></div><div class="lens" id="ep02-lens-2" style="top:289px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:304px"><img data-layout-allow-overflow src="assets/screens/w_record_transcript.png" style="width:554.1px; left:-17.05px; top:-565.46px" /></div></div><div class="lens" id="ep02-lens-3" style="top:143px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:597px"><img data-layout-allow-overflow src="assets/screens/w_record_draft_full.png" style="width:554.1px; left:-17.05px; top:-372.24px" /></div></div><div class="lens" id="ep02-lens-4" style="top:200px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:483px"><img data-layout-allow-overflow src="assets/screens/w_record_draft_full.png" style="width:554.1px; left:-17.05px; top:-2224.92px" /></div></div><div class="lens" id="ep02-lens-5" style="top:143px"><div class="lhead"><i></i>확대해서 보기</div>
+      <div class="lview" style="width:520px; height:597px"><img data-layout-allow-overflow src="assets/screens/w_record_saved_full.png" style="width:554.1px; left:-17.05px; top:-198.91px" /></div></div>
+<div class="note" id="ep02-note-6" style="left:1296px; top:300px"><div class="nicon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+  <div class="ntitle">AI 결과는 모두 초안</div><div class="nbody">최종 확인과 수정은 현장인력이 합니다.</div></div>
+<div class="cap stage" id="cap-ep02-0"><span>다음은 핵심 기능인 30초 구술 기록입니다. 방문을 마치고 기록하기를 누릅니다.</span></div>
+<div class="cap stage" id="cap-ep02-1"><span>대상자를 고르고 녹음 시작을 누른 뒤, 방문 내용을 30초 정도 말합니다.</span></div>
+<div class="cap stage" id="cap-ep02-2"><span>녹음을 마치면 음성이 바로 글자로 바뀝니다. 잘못 받아 적은 부분은 이 자리에서 고칠 수 있고, 음성 원본은 저장하지 않습니다.</span></div>
+<div class="cap stage" id="cap-ep02-3"><span>기록 초안 만들기를 누르면, AI가 노인맞춤돌봄 기록 항목에 맞춰 요약, 복약, 식사, 제공 서비스, 후속 조치를 나눠 채웁니다.</span></div>
+<div class="cap stage" id="cap-ep02-4"><span>동시에 구술 속 위험 신호를 찾아 근거 문장과 함께 보여줍니다. 사실과 다르면 빼고 저장하면 됩니다.</span></div>
+<div class="cap stage" id="cap-ep02-5"><span>저장하면 신호는 동 담당자 화면에 공유되고, 규격에 맞춘 기록 글을 복사해 기존 시스템에 그대로 붙여 넣을 수 있습니다.</span></div>
+<div class="cap stage" id="cap-ep02-6"><span>AI가 만든 결과는 모두 초안이며, 최종 확인과 수정은 현장인력이 합니다.</span></div>
+<audio id="vo-ep02-0" src="assets/vo/ep02_00.mp3" data-start="1.4" data-duration="5.1" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-1" src="assets/vo/ep02_01.mp3" data-start="7" data-duration="4.1" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-2" src="assets/vo/ep02_02.mp3" data-start="11.6" data-duration="7.8" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-3" src="assets/vo/ep02_03.mp3" data-start="19.9" data-duration="7.95" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-4" src="assets/vo/ep02_04.mp3" data-start="28.35" data-duration="5.85" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-5" src="assets/vo/ep02_05.mp3" data-start="34.7" data-duration="6.65" data-track-index="9" data-volume="1"></audio>
+<audio id="vo-ep02-6" src="assets/vo/ep02_06.mp3" data-start="41.85" data-duration="5.05" data-track-index="9" data-volume="1"></audio>
+<script>
+const tl = gsap.timeline({ paused: true });
+tl.fromTo(".glow-a", {scale:1, x:0}, {scale:1.12, x:-40, duration:4, ease:"sine.inOut", yoyo:true, repeat:11}, 0);
+tl.fromTo(".glow-b", {scale:1.1, y:0}, {scale:1, y:-30, duration:4, ease:"sine.inOut", yoyo:true, repeat:11}, 0);
+tl.fromTo(".ghost", {x:0}, {x:-120, duration:48.5, ease:"none"}, 0);
+tl.fromTo("#ep02-chips", {opacity:0, x:-30}, {opacity:1, x:0, duration:0.5, ease:"power3.out"}, 0.15);
+tl.fromTo("#ep02-title", {opacity:0, y:36}, {opacity:1, y:0, duration:0.7, ease:"expo.out"}, 0.3);
+tl.fromTo("#ep02-sub", {opacity:0, y:20}, {opacity:1, y:0, duration:0.6, ease:"power2.out"}, 0.5);
+tl.fromTo("#ep02-rule", {scaleX:0}, {scaleX:1, duration:0.6, ease:"power3.inOut"}, 0.6);
+tl.fromTo("#ep02-step-0", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.75);
+tl.fromTo("#ep02-step-1", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.81);
+tl.fromTo("#ep02-step-2", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.87);
+tl.fromTo("#ep02-step-3", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.93);
+tl.fromTo("#ep02-step-4", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 0.99);
+tl.fromTo("#ep02-step-5", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 1.05);
+tl.fromTo("#ep02-step-6", {opacity:0, x:-24}, {opacity:1, x:0, duration:0.45, ease:"back.out(1.6)"}, 1.11);
+tl.to("#ep02-step-0 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 1.25);
+tl.to("#ep02-step-0 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 1.25);
+tl.to("#ep02-step-0 .lbl", {color:"#1b2453", duration:0.35}, 1.25);
+tl.to("#ep02-step-0 .bgfill", {opacity:0, duration:0.3}, 6.85);
+tl.to("#ep02-step-0 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 6.85);
+tl.to("#ep02-step-0 .lbl", {color:"#4b5578", duration:0.3}, 6.85);
+tl.to("#ep02-step-1 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 6.85);
+tl.to("#ep02-step-1 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 6.85);
+tl.to("#ep02-step-1 .lbl", {color:"#1b2453", duration:0.35}, 6.85);
+tl.to("#ep02-step-1 .bgfill", {opacity:0, duration:0.3}, 11.45);
+tl.to("#ep02-step-1 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 11.45);
+tl.to("#ep02-step-1 .lbl", {color:"#4b5578", duration:0.3}, 11.45);
+tl.to("#ep02-step-2 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 11.45);
+tl.to("#ep02-step-2 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 11.45);
+tl.to("#ep02-step-2 .lbl", {color:"#1b2453", duration:0.35}, 11.45);
+tl.to("#ep02-step-2 .bgfill", {opacity:0, duration:0.3}, 19.75);
+tl.to("#ep02-step-2 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 19.75);
+tl.to("#ep02-step-2 .lbl", {color:"#4b5578", duration:0.3}, 19.75);
+tl.to("#ep02-step-3 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 19.75);
+tl.to("#ep02-step-3 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 19.75);
+tl.to("#ep02-step-3 .lbl", {color:"#1b2453", duration:0.35}, 19.75);
+tl.to("#ep02-step-3 .bgfill", {opacity:0, duration:0.3}, 28.2);
+tl.to("#ep02-step-3 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 28.2);
+tl.to("#ep02-step-3 .lbl", {color:"#4b5578", duration:0.3}, 28.2);
+tl.to("#ep02-step-4 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 28.2);
+tl.to("#ep02-step-4 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 28.2);
+tl.to("#ep02-step-4 .lbl", {color:"#1b2453", duration:0.35}, 28.2);
+tl.to("#ep02-step-4 .bgfill", {opacity:0, duration:0.3}, 34.55);
+tl.to("#ep02-step-4 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 34.55);
+tl.to("#ep02-step-4 .lbl", {color:"#4b5578", duration:0.3}, 34.55);
+tl.to("#ep02-step-5 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 34.55);
+tl.to("#ep02-step-5 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 34.55);
+tl.to("#ep02-step-5 .lbl", {color:"#1b2453", duration:0.35}, 34.55);
+tl.to("#ep02-step-5 .bgfill", {opacity:0, duration:0.3}, 41.7);
+tl.to("#ep02-step-5 .num", {backgroundColor:"#d9ddf5", color:"#4f46e5", scale:1, duration:0.3}, 41.7);
+tl.to("#ep02-step-5 .lbl", {color:"#4b5578", duration:0.3}, 41.7);
+tl.to("#ep02-step-6 .bgfill", {opacity:1, duration:0.35, ease:"power2.out"}, 41.7);
+tl.to("#ep02-step-6 .num", {backgroundColor:"#4f46e5", color:"#ffffff", scale:1.08, duration:0.35, ease:"back.out(2)"}, 41.7);
+tl.to("#ep02-step-6 .lbl", {color:"#1b2453", duration:0.35}, 41.7);
+tl.fromTo("#ep02-phone", {opacity:0, y:80, rotation:2}, {opacity:1, y:0, rotation:0, duration:0.9, ease:"power3.out"}, 0.35);
+tl.set("#ep02-L-w_visits", {opacity:1}, 0);
+tl.fromTo("#ep02-tap-0-0", {opacity:0, scale:0.4}, {opacity:1, scale:1, duration:0.18, ease:"power2.out", immediateRender:false}, 1.6);
+tl.to("#ep02-tap-0-0", {opacity:0, scale:1.9, duration:0.45, ease:"power2.out"}, 1.8);
+tl.to("#ep02-L-w_visits", {opacity:0, x:-30, duration:0.4, ease:"power2.in"}, 1.95);
+tl.set("#ep02-S-w_record_initial", {y:0}, 1.95);
+tl.fromTo("#ep02-L-w_record_initial", {opacity:0, x:40}, {opacity:1, x:0, duration:0.5, ease:"power3.out", immediateRender:false}, 2.1);
+tl.fromTo("#ep02-hl-0", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 2.2);
+tl.fromTo("#ep02-lens-0", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 2.3);
+tl.fromTo("#ep02-tap-1-0", {opacity:0, scale:0.4}, {opacity:1, scale:1, duration:0.18, ease:"power2.out", immediateRender:false}, 7.2);
+tl.to("#ep02-tap-1-0", {opacity:0, scale:1.9, duration:0.45, ease:"power2.out"}, 7.4);
+tl.to("#ep02-L-w_record_initial", {opacity:0, x:-30, duration:0.4, ease:"power2.in"}, 7.55);
+tl.set("#ep02-S-w_record_recording", {y:0}, 7.55);
+tl.fromTo("#ep02-L-w_record_recording", {opacity:0, x:40}, {opacity:1, x:0, duration:0.5, ease:"power3.out", immediateRender:false}, 7.7);
+tl.to("#ep02-lens-0", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 7.55);
+tl.to("#ep02-hl-0", {opacity:0, duration:0.25}, 7.55);
+tl.fromTo("#ep02-hl-1", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 7.8);
+tl.fromTo("#ep02-lens-1", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 7.9);
+tl.fromTo("#ep02-tap-2-0", {opacity:0, scale:0.4}, {opacity:1, scale:1, duration:0.18, ease:"power2.out", immediateRender:false}, 11.8);
+tl.to("#ep02-tap-2-0", {opacity:0, scale:1.9, duration:0.45, ease:"power2.out"}, 12);
+tl.to("#ep02-L-w_record_recording", {opacity:0, x:-30, duration:0.4, ease:"power2.in"}, 12.15);
+tl.set("#ep02-S-w_record_transcript", {y:0}, 12.15);
+tl.fromTo("#ep02-L-w_record_transcript", {opacity:0, x:40}, {opacity:1, x:0, duration:0.5, ease:"power3.out", immediateRender:false}, 12.3);
+tl.to("#ep02-lens-1", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 12.15);
+tl.to("#ep02-hl-1", {opacity:0, duration:0.25}, 12.15);
+tl.fromTo("#ep02-hl-2", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 12.4);
+tl.fromTo("#ep02-lens-2", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 12.5);
+tl.fromTo("#ep02-tap-3-0", {opacity:0, scale:0.4}, {opacity:1, scale:1, duration:0.18, ease:"power2.out", immediateRender:false}, 20.1);
+tl.to("#ep02-tap-3-0", {opacity:0, scale:1.9, duration:0.45, ease:"power2.out"}, 20.3);
+tl.to("#ep02-L-w_record_transcript", {opacity:0, x:-30, duration:0.4, ease:"power2.in"}, 20.45);
+tl.set("#ep02-S-w_record_draft_full", {y:0}, 20.45);
+tl.fromTo("#ep02-L-w_record_draft_full", {opacity:0, x:40}, {opacity:1, x:0, duration:0.5, ease:"power3.out", immediateRender:false}, 20.6);
+tl.to("#ep02-lens-2", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 20.45);
+tl.to("#ep02-hl-2", {opacity:0, duration:0.25}, 20.45);
+tl.fromTo("#ep02-hl-3", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 20.7);
+tl.fromTo("#ep02-lens-3", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 20.8);
+tl.to("#ep02-S-w_record_draft_full", {y:-1240, duration:1.1, ease:"power2.inOut"}, 28.35);
+tl.to("#ep02-lens-3", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 28.95);
+tl.to("#ep02-hl-3", {opacity:0, duration:0.25}, 28.95);
+tl.fromTo("#ep02-hl-4", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 29.2);
+tl.fromTo("#ep02-lens-4", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 29.3);
+tl.fromTo("#ep02-tap-5-0", {opacity:0, scale:0.4}, {opacity:1, scale:1, duration:0.18, ease:"power2.out", immediateRender:false}, 34.9);
+tl.to("#ep02-tap-5-0", {opacity:0, scale:1.9, duration:0.45, ease:"power2.out"}, 35.1);
+tl.to("#ep02-L-w_record_draft_full", {opacity:0, x:-30, duration:0.4, ease:"power2.in"}, 35.25);
+tl.set("#ep02-S-w_record_saved_full", {y:0}, 35.25);
+tl.fromTo("#ep02-L-w_record_saved_full", {opacity:0, x:40}, {opacity:1, x:0, duration:0.5, ease:"power3.out", immediateRender:false}, 35.4);
+tl.to("#ep02-lens-4", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 35.25);
+tl.to("#ep02-hl-4", {opacity:0, duration:0.25}, 35.25);
+tl.fromTo("#ep02-hl-5", {opacity:0, scale:1.06}, {opacity:1, scale:1, duration:0.35, ease:"power2.out", immediateRender:false}, 35.5);
+tl.fromTo("#ep02-lens-5", {opacity:0, y:30, scale:0.96}, {opacity:1, y:0, scale:1, duration:0.55, ease:"back.out(1.4)", immediateRender:false}, 35.6);
+tl.to("#ep02-lens-5", {opacity:0, y:-20, duration:0.3, ease:"power2.in"}, 41.85);
+tl.to("#ep02-hl-5", {opacity:0, duration:0.25}, 41.85);
+tl.fromTo("#ep02-note-6", {opacity:0, y:30}, {opacity:1, y:0, duration:0.6, ease:"expo.out", immediateRender:false}, 42.2);
+tl.fromTo("#cap-ep02-0", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 1.3);
+tl.to("#cap-ep02-0", {opacity:0, duration:0.25, ease:"power1.in"}, 6.65);
+tl.fromTo("#cap-ep02-1", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 6.9);
+tl.to("#cap-ep02-1", {opacity:0, duration:0.25, ease:"power1.in"}, 11.25);
+tl.fromTo("#cap-ep02-2", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 11.5);
+tl.to("#cap-ep02-2", {opacity:0, duration:0.25, ease:"power1.in"}, 19.55);
+tl.fromTo("#cap-ep02-3", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 19.8);
+tl.to("#cap-ep02-3", {opacity:0, duration:0.25, ease:"power1.in"}, 28);
+tl.fromTo("#cap-ep02-4", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 28.25);
+tl.to("#cap-ep02-4", {opacity:0, duration:0.25, ease:"power1.in"}, 34.35);
+tl.fromTo("#cap-ep02-5", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 34.6);
+tl.to("#cap-ep02-5", {opacity:0, duration:0.25, ease:"power1.in"}, 41.5);
+tl.fromTo("#cap-ep02-6", {opacity:0, y:14}, {opacity:1, y:0, duration:0.3, ease:"power2.out", immediateRender:false}, 41.75);
+tl.to("#cap-ep02-6", {opacity:0, duration:0.25, ease:"power1.in"}, 47.05);
+window.__timelines["ep02"] = tl;
+</script>
+</div>
+</body>
+</html>

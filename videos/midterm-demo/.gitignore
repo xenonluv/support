@@ -1,0 +1,9 @@
+# 비밀 키 (Typecast API)
+.env*
+# 렌더링 결과·로그·임시 파일 (용량이 커서 올리지 않는다)
+renders/
+renders-*.txt
+.hyperframes/
+.thumbnails/
+# 이전 목소리(edge-tts) 백업
+assets/vo/edge-backup/

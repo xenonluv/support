@@ -1,0 +1,203 @@
+// 인트로(ep00)·마무리(ep07). 문장마다 장면 하나.
+import { BASE_CSS, beatTimes, captions, audios, captionTweens, ambientTweens, page, icon } from "./build.mjs";
+
+const r2 = (n) => Math.round(n * 100) / 100;
+
+const CSS = `
+.scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1000px; opacity: 0; }
+.brand-tile { width: 132px; height: 132px; border-radius: 34px; background: #4f46e5; display: flex; align-items: center; justify-content: center; box-shadow: 0 24px 50px rgba(79,70,229,0.35); }
+.kicker { font-size: 28px; font-weight: 700; color: #4f46e5; letter-spacing: 0.02em; }
+.h-xl { font-size: 150px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.h-l { font-size: 72px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+.h-m { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; }
+.body-l { font-size: 34px; font-weight: 500; line-height: 1.45; color: #3d466b; }
+.pill { display: flex; align-items: center; gap: 16px; height: 96px; padding: 0 34px; border-radius: 999px; background: #fff; border: 3px solid #d5dbec; font-size: 31px; font-weight: 700; box-shadow: 0 14px 30px rgba(27,36,83,0.08); }
+.pill.dark { background: #1b2453; color: #fff; border-color: #1b2453; }
+.arrow { font-size: 40px; color: #59628a; font-weight: 800; }
+.card { position: absolute; background: #fff; border-radius: 28px; border: 2px solid #d5dbec; box-shadow: 0 24px 50px rgba(27,36,83,0.10); padding: 40px 42px; }
+.badge-n { width: 64px; height: 64px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; }
+.card .ct { margin-top: 24px; font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+.card .cs { margin-top: 12px; font-size: 26px; color: #5a6385; font-weight: 500; line-height: 1.45; }
+.node { position: absolute; width: 380px; padding: 28px 30px; background: #fff; border-radius: 26px; border: 2px solid #d5dbec; box-shadow: 0 20px 40px rgba(27,36,83,0.10); }
+.node .nn { font-size: 30px; font-weight: 800; }
+.node .memo { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.node .memo div { height: 18px; border-radius: 9px; background: #e4e8f4; }
+.elder { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: #1b2453; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 30px 60px rgba(27,36,83,0.3); }
+.elder b { font-size: 46px; font-weight: 800; } .elder span { margin-top: 8px; font-size: 26px; color: #c9cdf7; font-weight: 600; }
+.wire { position: absolute; height: 4px; background: repeating-linear-gradient(90deg, #aab2d4 0 14px, transparent 14px 26px); transform-origin: 0 50%; }
+.callout { position: absolute; padding: 26px 40px; border-radius: 22px; background: #1b2453; color: #fff; font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+.callout em { font-style: normal; color: #a5b4fc; }
+.mode { position: absolute; top: 200px; }
+.mode .mt { font-size: 40px; font-weight: 800; display: flex; gap: 14px; align-items: center; }
+.mode .mt i { font-style: normal; font-size: 22px; padding: 7px 16px; border-radius: 999px; color: #fff; font-weight: 700; }
+.mode ul { list-style: none; margin-top: 26px; display: flex; flex-direction: column; gap: 14px; }
+.mode li { font-size: 28px; font-weight: 600; color: #3d466b; display: flex; gap: 14px; align-items: center; }
+.mode li b { width: 54px; height: 40px; border-radius: 12px; background: #e4e8f4; color: #1b2453; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; }
+.mphone { position: absolute; width: 300px; height: 626px; border-radius: 46px; background: #111633; box-shadow: 0 30px 70px rgba(27,36,83,0.28); }
+.mphone div { position: absolute; left: 11px; top: 11px; width: 278px; height: 604px; border-radius: 36px; overflow: hidden; }
+.mphone img { width: 278px; display: block; }
+.mwin { position: absolute; width: 760px; height: 500px; border-radius: 18px; background: #fff; overflow: hidden; box-shadow: 0 30px 70px rgba(27,36,83,0.24), 0 0 0 2px #d5dbec; }
+.mwin .bar { height: 34px; background: #e9ecf5; display: flex; gap: 8px; align-items: center; padding-left: 16px; }
+.mwin .bar b { width: 11px; height: 11px; border-radius: 50%; display: block; }
+.mwin img { width: 760px; display: block; }
+.tile { position: absolute; width: 400px; height: 360px; background: #fff; border-radius: 28px; border: 2px solid #d5dbec; padding: 36px 34px; box-shadow: 0 24px 50px rgba(27,36,83,0.10); }
+.tile .tk { font-size: 24px; font-weight: 800; color: #4f46e5; }
+.tile .tt { margin-top: 14px; font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.tile .ts { margin-top: 14px; font-size: 25px; color: #5a6385; font-weight: 500; line-height: 1.45; }
+.tile .ok { position: absolute; left: 34px; bottom: 30px; display: flex; gap: 8px; align-items: center; font-size: 22px; font-weight: 700; color: #0f766e; background: #e3f6f2; padding: 8px 16px; border-radius: 999px; }
+.stat { position: absolute; width: 380px; height: 300px; background: #fff; border-radius: 28px; border: 2px solid #d5dbec; padding: 38px 36px; box-shadow: 0 24px 50px rgba(27,36,83,0.10); }
+.stat .sv { font-size: 92px; font-weight: 800; letter-spacing: -0.04em; color: #1b2453; line-height: 1; }
+.stat .sv small { font-size: 46px; }
+.stat .sl { margin-top: 20px; font-size: 30px; font-weight: 700; }
+.stat .ss { margin-top: 8px; font-size: 23px; color: #5a6385; font-weight: 500; }
+.principle { position: absolute; width: 760px; padding: 52px 54px; border-radius: 32px; background: #1b2453; color: #fff; box-shadow: 0 30px 60px rgba(27,36,83,0.25); }
+.principle .pi { width: 84px; height: 84px; border-radius: 24px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; }
+.principle .pt { margin-top: 30px; font-size: 52px; font-weight: 800; line-height: 1.22; letter-spacing: -0.02em; }
+.principle .ps { margin-top: 18px; font-size: 28px; color: #d9ddf5; line-height: 1.5; font-weight: 500; }
+`;
+
+function backdrop() {
+  return `<div class="bg-dots"></div><div class="bg-glow glow-a"></div><div class="bg-glow glow-b"></div>
+  <div class="ghost" data-layout-ignore aria-hidden="true" style="left:60px; bottom:-70px">돌봄이음</div>`;
+}
+
+// 장면 전환: 앞 장면은 위로 빠지고, 다음 장면은 아래에서 들어온다
+function sceneSwap(prev, next, t) {
+  const out = [];
+  if (prev) out.push(`tl.to("${prev}", {opacity:0, y:-40, duration:0.45, ease:"power2.in"}, ${r2(t - 0.35)});`);
+  out.push(`tl.fromTo("${next}", {opacity:0, y:40}, {opacity:1, y:0, duration:0.6, ease:"power3.out", immediateRender:false}, ${r2(t)});`);
+  return out;
+}
+// 그룹 안 요소를 차례로 등장
+function cascade(sel, t, { y = 36, stagger = 0.12, ease = "back.out(1.5)", dur = 0.6 } = {}) {
+  return `tl.fromTo("${sel}", {opacity:0, y:${y}}, {opacity:1, y:0, duration:${dur}, ease:"${ease}", stagger:${stagger}, immediateRender:false}, ${r2(t)});`;
+}
+
+export function introBody(id) {
+  const { lines, duration } = beatTimes(id);
+  const [l0, l1, l2, l3] = lines;
+  const body = `${backdrop()}
+<div class="scene" id="${id}-A">
+  <div class="abs" style="left:170px; top:250px; display:flex; gap:44px; align-items:center">
+    <div class="brand-tile a-in">${icon("heart", 74, "#ffffff")}</div>
+    <div class="h-xl a-in">돌봄이음</div>
+  </div>
+  <div class="abs body-l a-in" style="left:174px; top:440px; width:1300px; font-size:44px; color:#1b2453; font-weight:700">광주다움 통합돌봄 현장인력을 위한 AI 기록·연계 보조 서비스</div>
+  <div class="abs a-in" style="left:174px; top:540px; height:5px; width:180px; background:#4f46e5; border-radius:4px"></div>
+  <div class="abs body-l a-in" style="left:174px; top:590px; width:1300px">방문 직후 30초 구술을 돌봄기록 초안, 인수인계 브리핑, 이상징후 알림으로 전환합니다.</div>
+  <div class="abs a-in" style="left:174px; top:740px; display:flex; gap:16px">
+    <div class="pill dark" style="height:70px; font-size:26px">2026 마이AI랩 AI-이음 프로젝트 · 중간보고</div>
+    <div class="pill" style="height:70px; font-size:26px">참가자 표준범</div>
+  </div>
+</div>
+<div class="scene" id="${id}-B">
+  <div class="abs kicker" style="left:170px; top:120px">제안의 배경</div>
+  <div class="abs h-l" style="left:170px; top:168px">기록이 흩어지고,<br>맥락이 끊깁니다</div>
+  <div class="abs body-l" style="left:170px; top:370px; width:560px">한 어르신을 여러 기관이 함께 돌보지만, 기록은 기관별 수첩과 시스템에 따로 남습니다.</div>
+  <div class="abs" style="left:1260px; top:520px; width:0; height:0; transform:rotate(-140deg)"><div class="wire b-w" style="left:0; top:-2px; width:300px"></div></div>
+  <div class="abs" style="left:1260px; top:520px; width:0; height:0; transform:rotate(-40deg)"><div class="wire b-w" style="left:0; top:-2px; width:300px"></div></div>
+  <div class="abs" style="left:1260px; top:520px; width:0; height:0; transform:rotate(90deg)"><div class="wire b-w" style="left:0; top:-2px; width:300px"></div></div>
+  <div class="node b-n" style="left:820px; top:190px"><div class="nn">동 행정복지센터</div><div class="memo"><div style="width:80%"></div><div style="width:55%"></div></div></div>
+  <div class="node b-n" style="left:1360px; top:190px"><div class="nn">노인맞춤돌봄 수행기관</div><div class="memo"><div style="width:70%"></div><div style="width:90%"></div></div></div>
+  <div class="node b-n" style="left:1090px; top:730px"><div class="nn">종합사회복지관</div><div class="memo"><div style="width:60%"></div><div style="width:75%"></div></div></div>
+  <div class="elder b-e" style="left:1110px; top:370px"><b>어르신</b><span>C-0012 · 70대</span></div>
+  <div class="callout b-c" style="left:170px; top:600px">돌봄은 <em>대상자 중심</em>,<br>기록은 <em>기관별</em></div>
+</div>
+<div class="scene" id="${id}-C">
+  <div class="abs kicker" style="left:170px; top:110px">돌봄이음이 하는 일</div>
+  <div class="abs h-l" style="left:170px; top:158px">30초 구술 하나로 세 가지 산출물</div>
+  <div class="abs" style="left:170px; top:330px; display:flex; gap:22px; align-items:center">
+    <div class="pill c-p">방문 직후 30초 구술</div><div class="arrow c-p">→</div>
+    <div class="pill c-p">한국어 음성인식</div><div class="arrow c-p">→</div>
+    <div class="pill c-p">생성형 AI 구조화</div><div class="arrow c-p">→</div>
+    <div class="pill dark c-p">규격 산출물 3종</div>
+  </div>
+  <div class="card c-c" style="left:170px; top:500px; width:500px"><div class="badge-n" style="background:#1b2453">1</div><div class="ct">돌봄기록 초안</div><div class="cs">노인맞춤돌봄 기록 항목에 맞춘, 복사해 붙여 넣는 규격 텍스트</div></div>
+  <div class="card c-c" style="left:710px; top:500px; width:500px"><div class="badge-n" style="background:#15803d">2</div><div class="ct">인수인계 브리핑</div><div class="cs">여러 기관의 기록을 대상자 기준으로 한 장에 요약</div></div>
+  <div class="card c-c" style="left:1250px; top:500px; width:500px"><div class="badge-n" style="background:#6d28d9">3</div><div class="ct">이상징후 알림</div><div class="cs">위험 신호를 근거 문장과 표시하고 알림 문안 초안 제시</div></div>
+</div>
+<div class="scene" id="${id}-D">
+  <div class="abs kicker" style="left:170px; top:100px">오늘 보여드릴 화면</div>
+  <div class="abs h-l" style="left:170px; top:148px">실제 운영 중인 두 가지 모드</div>
+  <div class="mphone d-i" style="left:170px; top:300px"><div><img src="assets/screens/w_visits.png" /></div></div>
+  <div class="mode d-i" style="left:510px; top:330px"><div class="mt">현장인력 모드 <i style="background:#4f46e5">휴대폰</i></div>
+    <ul><li><b>01</b>오늘의 방문 · 대상자 상황</li><li><b>02</b>30초 구술 기록 초안</li><li><b>03</b>내 기록 · 관리자 알림</li></ul></div>
+  <div class="mwin d-i" style="left:1010px; top:300px"><div class="bar"><b style="background:#ff5f57"></b><b style="background:#febc2e"></b><b style="background:#28c840"></b></div><img src="assets/screens/m_signals.png" /></div>
+  <div class="mode d-i" style="left:1010px; top:830px"><div class="mt">관리자 모드 <i style="background:#1b2453">PC</i></div></div>
+  <div class="mode d-i" style="left:1010px; top:900px"><ul style="flex-direction:row; gap:30px; margin-top:0"><li><b>04</b>이상징후·현장 알림</li><li><b>05</b>인수인계 브리핑</li><li><b>06</b>대상자·성과 지표</li></ul></div>
+</div>
+${captions(id, lines)}
+${audios(id, lines)}`;
+  const tw = [ambientTweens(duration)];
+  tw.push(...sceneSwap(null, `#${id}-A`, 0.2));
+  tw.push(cascade(`#${id}-A .a-in`, 0.35, { stagger: 0.14, ease: "expo.out", dur: 0.8 }));
+  tw.push(...sceneSwap(`#${id}-A`, `#${id}-B`, l1.start));
+  tw.push(cascade(`#${id}-B .b-n`, l1.start + 0.3, { stagger: 0.25 }));
+  tw.push(`tl.fromTo("#${id}-B .b-e", {opacity:0, scale:0.6}, {opacity:1, scale:1, duration:0.7, ease:"back.out(1.7)", immediateRender:false}, ${r2(l1.start + 0.75)});`);
+  tw.push(`tl.fromTo("#${id}-B .b-w", {opacity:0, scaleX:0}, {opacity:1, scaleX:1, duration:0.6, ease:"power3.out", stagger:0.2, immediateRender:false}, ${r2(l1.start + 1.0)});`);
+  tw.push(`tl.fromTo("#${id}-B .b-c", {opacity:0, x:-40}, {opacity:1, x:0, duration:0.7, ease:"expo.out", immediateRender:false}, ${r2(l1.start + 3.2)});`);
+  tw.push(`tl.fromTo("#${id}-B .node", {y:0}, {y:-10, duration:2, ease:"sine.inOut", yoyo:true, repeat:1, stagger:0.4, immediateRender:false}, ${r2(l1.start + 1.5)});`);
+  tw.push(...sceneSwap(`#${id}-B`, `#${id}-C`, l2.start));
+  tw.push(cascade(`#${id}-C .c-p`, l2.start + 0.3, { stagger: 0.32, y: 24, ease: "power3.out", dur: 0.5 }));
+  tw.push(cascade(`#${id}-C .c-c`, l2.start + 3.4, { stagger: 0.7, y: 50 }));
+  tw.push(...sceneSwap(`#${id}-C`, `#${id}-D`, l3.start));
+  tw.push(cascade(`#${id}-D .d-i`, l3.start + 0.3, { stagger: 0.35, y: 50, ease: "power3.out", dur: 0.7 }));
+  tw.push(captionTweens(id, lines));
+  return page(id, duration, CSS, body, tw.join("\n"));
+}
+
+export function outroBody(id) {
+  const { lines, duration } = beatTimes(id);
+  const [l0, l1, l2, l3] = lines;
+  const tiles = [
+    ["기록", "30초 구술 → 기록 초안", "음성인식과 AI로 규격 기록 초안을 만듭니다."],
+    ["연계", "인수인계 브리핑", "여러 기관 기록을 한 어르신 기준으로 요약합니다."],
+    ["안전", "이상징후 표시", "근거 문장과 함께 신호를 모으고 알림 문안을 제시합니다."],
+    ["알림", "관리자 → 현장인력", "확인이 필요한 어르신을 휴대폰으로 알립니다."],
+  ];
+  const stats = [
+    ["50", "%↓", "기록 작성시간", "사전·사후 측정"],
+    ["5~10", "명", "참여 인력", "실사용 2주 이상"],
+    ["200", "건", "누적 기록", "현장 파일럿"],
+    ["80", "%", "초안 수용률", "수정 없이·소폭 수정"],
+  ];
+  const body = `${backdrop()}
+<div class="scene" id="${id}-A">
+  <div class="abs kicker" style="left:170px; top:120px">정리</div>
+  <div class="abs h-l" style="left:170px; top:168px">지금, 실제 운영 환경에서 동작합니다</div>
+  ${tiles.map((t, i) => `<div class="tile a-t" style="left:${170 + i * 410}px; top:360px"><div class="tk">${t[0]}</div><div class="tt">${t[1]}</div><div class="ts">${t[2]}</div><div class="ok">${icon("check", 22, "#0f766e")}운영 중</div></div>`).join("")}
+</div>
+<div class="scene" id="${id}-B">
+  <div class="abs kicker" style="left:170px; top:120px">운영 원칙</div>
+  <div class="abs h-l" style="left:170px; top:168px">AI는 판단자가 아니라 보조자입니다</div>
+  <div class="principle b-p" style="left:170px; top:370px"><div class="pi">${icon("lock", 46, "#ffffff")}</div><div class="pt">음성 원본·개인식별정보는 저장하지 않습니다</div><div class="ps">어르신은 식별번호로만 관리하고, AI 호출 전에 가명 처리합니다.</div></div>
+  <div class="principle b-p" style="left:990px; top:370px"><div class="pi">${icon("check", 46, "#ffffff")}</div><div class="pt">모든 AI 결과는 현장인력이 확인하는 초안입니다</div><div class="ps">이상징후는 판정이 아니라 ‘확인이 필요한 신호’로만 표시합니다.</div></div>
+</div>
+<div class="scene" id="${id}-C">
+  <div class="abs kicker" style="left:170px; top:120px">남은 기간 · 현장 파일럿</div>
+  <div class="abs h-l" style="left:170px; top:168px">성과발표에서 측정 결과로 보고드리겠습니다</div>
+  ${stats.map((s, i) => `<div class="stat c-s" style="left:${170 + i * 400}px; top:380px"><div class="sv">${s[0]}<small>${s[1]}</small></div><div class="sl">${s[2]}</div><div class="ss">${s[3]}</div></div>`).join("")}
+  <div class="abs c-s" style="left:170px; top:740px; display:flex; gap:16px"><div class="pill dark" style="height:70px; font-size:26px">10월 중간보고</div><div class="arrow" style="line-height:70px">→</div><div class="pill" style="height:70px; font-size:26px">현장 파일럿 측정</div><div class="arrow" style="line-height:70px">→</div><div class="pill" style="height:70px; font-size:26px">11월 성과발표</div></div>
+</div>
+<div class="scene" id="${id}-D">
+  <div class="abs" style="left:0; right:0; top:250px; display:flex; flex-direction:column; align-items:center">
+    <div class="brand-tile d-i">${icon("heart", 74, "#ffffff")}</div>
+    <div class="h-xl d-i" style="margin-top:40px">감사합니다</div>
+    <div class="body-l d-i" style="margin-top:34px; color:#1b2453; font-weight:700">돌봄이음 · 30초 구술로 기록 부담을 줄이고, 기관 간 돌봄 맥락을 잇습니다</div>
+    <div class="d-i" style="margin-top:40px; display:flex; gap:16px"><div class="pill dark" style="height:70px; font-size:26px">dolbomieum.kr</div><div class="pill" style="height:70px; font-size:26px">참가자 표준범</div></div>
+  </div>
+</div>
+${captions(id, lines.slice(0, 3))}
+${audios(id, lines)}`;
+  const tw = [ambientTweens(duration)];
+  tw.push(...sceneSwap(null, `#${id}-A`, 0.2));
+  tw.push(cascade(`#${id}-A .a-t`, 0.6, { stagger: 0.5, y: 50 }));
+  tw.push(...sceneSwap(`#${id}-A`, `#${id}-B`, l1.start));
+  tw.push(cascade(`#${id}-B .b-p`, l1.start + 0.3, { stagger: 2.4, y: 50, ease: "expo.out", dur: 0.8 }));
+  tw.push(...sceneSwap(`#${id}-B`, `#${id}-C`, l2.start));
+  tw.push(cascade(`#${id}-C .c-s`, l2.start + 0.4, { stagger: 0.45, y: 50 }));
+  tw.push(...sceneSwap(`#${id}-C`, `#${id}-D`, l3.start - 0.2));
+  tw.push(cascade(`#${id}-D .d-i`, l3.start, { stagger: 0.18, y: 30, ease: "expo.out", dur: 0.8 }));
+  tw.push(captionTweens(id, lines.slice(0, 3)));
+  return page(id, duration, CSS, body, tw.join("\n"));
+}

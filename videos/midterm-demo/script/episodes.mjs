@@ -1,0 +1,107 @@
+// 편별 장면 정의. 좌표는 모두 캡처 화면의 CSS 픽셀 기준
+// (현장인력: 390×844 휴대폰 화면, 관리자: 1440 너비 PC 화면).
+// 문장 하나 = 비트 하나. narration.json의 문장 순서와 같아야 한다.
+
+export const EPISODES = {
+  ep01: {
+    mode: "worker",
+    no: "01",
+    title: "오늘의 방문과\n대상자 상황",
+    subtitle: "방문 전에 어르신 상황을 먼저 봅니다",
+    start: "w_login",
+    beats: [
+      { step: "휴대폰 브라우저로 로그인", screen: "w_login", lens: { x: 10, y: 215, w: 370, h: 370 } },
+      { step: "담당 어르신 목록", screen: "w_visits", tap: { x: 195, y: 542 }, lens: { x: 16, y: 338, w: 358, h: 165 } },
+      { step: "미해결 이상징후 확인", screen: "w_visit_detail_full", tap: { x: 110, y: 459 }, lens: { x: 12, y: 197, w: 366, h: 284 } },
+      { step: "모든 기관의 기록", screen: "w_visit_detail_full", scroll: 420, lens: { x: 12, y: 584, w: 366, h: 380 } },
+      { step: "식별번호로만 관리", screen: "w_visit_detail_full", scroll: 0, lens: { x: 10, y: 104, w: 370, h: 70 } },
+    ],
+  },
+  ep02: {
+    mode: "worker",
+    no: "02",
+    title: "30초 구술로\n기록 초안 만들기",
+    subtitle: "말하면 AI가 규격 기록 초안을 만듭니다",
+    start: "w_visits",
+    beats: [
+      { step: "기록하기", screen: "w_record_initial", tap: { x: 278, y: 459 }, lens: { x: 12, y: 140, w: 366, h: 150 } },
+      { step: "녹음 시작 · 30초 구술", screen: "w_record_recording", tap: { x: 195, y: 386 }, lens: { x: 80, y: 298, w: 230, h: 176 } },
+      { step: "음성 → 글자 (원본 미저장)", screen: "w_record_transcript", tap: { x: 195, y: 386 }, lens: { x: 12, y: 398, w: 366, h: 214 } },
+      { step: "기록 항목별 초안", screen: "w_record_draft_full", tap: { x: 195, y: 655 }, lens: { x: 12, y: 262, w: 366, h: 420 } },
+      { step: "위험 신호와 근거 문장", screen: "w_record_draft_full", scroll: 1240, lens: { x: 12, y: 1566, w: 366, h: 340 } },
+      { step: "저장 · 공유 · 복사", screen: "w_record_saved_full", tap: { x: 293, y: 697 }, lens: { x: 12, y: 140, w: 366, h: 420 } },
+      { step: "결과는 모두 초안", screen: "w_record_saved_full", note: { icon: "check", title: "AI 결과는 모두 초안", body: "최종 확인과 수정은 현장인력이 합니다." } },
+    ],
+  },
+  ep03: {
+    mode: "worker",
+    no: "03",
+    title: "내 기록과\n관리자 알림 받기",
+    subtitle: "남긴 기록을 다시 쓰고, 관리자 알림을 받습니다",
+    start: "w_record_saved_full",
+    beats: [
+      { step: "내 기록 모아 보기", screen: "w_myrecords_full", tap: { x: 325, y: 815 }, lens: { x: 16, y: 122, w: 358, h: 362 } },
+      { step: "초안 그대로 / 고쳐서 저장", screen: "w_myrecords_full", lens: { x: 16, y: 128, w: 358, h: 66 } },
+      {
+        step: "알림 받기 켜기",
+        screen: "w_visits",
+        tap: { x: 65, y: 815 },
+        lens: { x: 16, y: 146, w: 358, h: 182 },
+        after: { at: 2.6, tap: { x: 195, y: 261 }, screen: "w_visits_push_on", lens: { x: 16, y: 146, w: 358, h: 132 } },
+      },
+      { step: "잠금 화면에 알림 도착", screen: "lock", note: { icon: "lock", title: "잠금 화면에 보이는 알림", body: "“확인이 필요한 대상자가 있습니다.” 이름·식별번호·건강 정보는 넣지 않습니다." } },
+      { step: "누르면 상황 화면", screen: "w_visit_detail_full", tap: { x: 195, y: 112 }, note: { icon: "phone", title: "급한 일은 전화로", body: "웹 알림은 늦거나 오지 않을 수 있어, 꼭 전달할 일은 전화로 연락합니다." } },
+    ],
+  },
+  ep04: {
+    mode: "manager",
+    no: "04",
+    title: "이상징후 현황과\n현장 알림",
+    subtitle: "여러 기관의 위험 신호를 한곳에서 봅니다",
+    start: "m_signals",
+    beats: [
+      { step: "동 담당자 PC 화면", screen: "m_signals" },
+      { step: "먼저 볼 어르신", screen: "m_signals", zoom: { x: 290, y: 392, w: 1130, h: 220 }, hl: { x: 296, y: 412, w: 1118, h: 186 } },
+      { step: "현황 한눈에", screen: "m_signals", zoom: { x: 290, y: 190, w: 1130, h: 176 }, hl: { x: 296, y: 198, w: 1108, h: 158 } },
+      { step: "정렬 기준", screen: "m_signals", zoom: { x: 290, y: 360, w: 800, h: 150 }, hl: { x: 296, y: 372, w: 640, h: 36 } },
+      { step: "겹치는 신호 묶음", screen: "m_signal_detail", click: { x: 850, y: 456 }, zoom: { x: 610, y: 52, w: 480, h: 262 }, hl: { x: 628, y: 172, w: 444, h: 136 } },
+      { step: "근거 문장 · 상태 변경", screen: "m_signal_detail", zoom: { x: 610, y: 318, w: 480, h: 300 }, hl: { x: 628, y: 326, w: 444, h: 222 } },
+      { step: "연계 알림 문안 초안", screen: "m_signal_detail", zoom: { x: 610, y: 900, w: 480, h: 250 }, hl: { x: 628, y: 908, w: 444, h: 228 } },
+      { step: "현장 인력에게 알림", screen: "m_signal_detail", zoom: { x: 610, y: 1150, w: 480, h: 180 }, click: { x: 850, y: 1281, at: 1.6 }, phonePush: 2.4 },
+      { step: "AI는 판정하지 않음", screen: "m_signal_detail", zoom: { x: 610, y: 1150, w: 480, h: 260 }, note: { icon: "info", title: "AI는 판정하지 않습니다", body: "위험 신호는 ‘확인이 필요한 신호’로만 보여 주고, 판단은 담당자가 합니다." } },
+    ],
+  },
+  ep05: {
+    mode: "manager",
+    no: "05",
+    title: "인수인계 브리핑",
+    subtitle: "여러 기관의 기록을 한 장으로 요약합니다",
+    start: "m_briefing_list",
+    beats: [
+      { step: "담당자 교체 · 사례회의", screen: "m_briefing_list", zoom: { x: 290, y: 24, w: 1000, h: 400 }, hl: { x: 463, y: 166, w: 766, h: 100 } },
+      { step: "기록과 신호를 한 화면에", screen: "m_briefing_before", click: { x: 846, y: 216 }, zoom: { x: 500, y: 56, w: 690, h: 590 }, hl: { x: 512, y: 345, w: 666, h: 142 } },
+      { step: "AI 브리핑 만들기", screen: "m_briefing_after", click: { x: 845, y: 609, at: 0.6 }, via: { screen: "m_briefing_loading", hold: 1.6 }, zoom: { x: 500, y: 500, w: 690, h: 330 }, hl: { x: 512, y: 512, w: 666, h: 160 } },
+      { step: "지난 2주를 10초 안팎에", screen: "m_briefing_after", zoom: { x: 500, y: 676, w: 690, h: 480 }, hl: { x: 512, y: 684, w: 666, h: 136 } },
+      { step: "초안 · 복사해서 사용", screen: "m_briefing_after", zoom: { x: 500, y: 1006, w: 690, h: 250 }, hl: { x: 512, y: 1010, w: 666, h: 230 } },
+    ],
+  },
+  ep06: {
+    mode: "manager",
+    no: "06",
+    title: "대상자 관리와\n성과 지표",
+    subtitle: "개인정보 없이 관리하고, 파일럿 목표를 측정합니다",
+    start: "m_clients",
+    beats: [
+      {
+        step: "식별번호·연령대·동만 등록",
+        screen: "m_clients",
+        zoom: { x: 290, y: 30, w: 960, h: 500 },
+        hl: { x: 463, y: 128, w: 700, h: 22 },
+        after: { at: 3.2, click: { x: 1171, y: 124 }, screen: "m_client_new", zoom: { x: 546, y: 100, w: 600, h: 300 }, hl: { x: 560, y: 128, w: 570, h: 270 } },
+      },
+      { step: "함께 돌볼 기관 · 번호 이력", screen: "m_client_detail", zoom: { x: 546, y: 450, w: 600, h: 410 }, hl: { x: 556, y: 470, w: 576, h: 164 } },
+      { step: "파일럿 목표 자동 집계", screen: "m_metrics", zoom: { x: 320, y: 236, w: 1050, h: 310 }, hl: { x: 334, y: 252, w: 1020, h: 282 } },
+      { step: "실제 참여자 기록만 집계", screen: "m_metrics", zoom: { x: 320, y: 100, w: 1050, h: 160 }, hl: { x: 334, y: 166, w: 1020, h: 62 } },
+    ],
+  },
+};
