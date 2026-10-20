@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Bell } from "lucide-react";
 import { AiNotice } from "@/components/ai-notice";
 import { AlertDraft } from "@/components/alert-draft";
+import { ClientPushButton } from "@/components/client-push-button";
 import { SignalStatusCard } from "@/components/signal-status-card";
 import { ToneBadge } from "@/components/tone-badge";
 import { clientLabel } from "@/lib/client-label";
 import { getClientDetail } from "@/lib/dashboard/data";
+import { vapidPublicKey } from "@/lib/push/send";
+import { seoulDateTime } from "@/lib/records/dates";
 
 const HEADLINE = { caution: "확인이 필요해요", observe: "지켜보는 중이에요", resolved: "해소됐어요" } as const;
 
@@ -61,6 +64,16 @@ async function Detail({ params }: Pick<PageProps<"/signals/[clientId]">, "params
         {item?.signals.map((s) => <SignalStatusCard key={s.type} clientCode={detail.code} signal={s} seenAt={detail.asOf} />)}
         {detail.alert && item && item.status !== "resolved" && (
           <AlertDraft initialText={detail.alert.body} alertId={detail.alert.id} copiedAt={detail.alert.copiedAt} />
+        )}
+        {vapidPublicKey() && (
+          <ClientPushButton
+            clientId={detail.id}
+            lastSent={
+              detail.lastPush
+                ? `${seoulDateTime(detail.lastPush.createdAt)}${detail.lastPush.delivered !== null ? ` · 기기 ${detail.lastPush.delivered}대로 발송` : ""}`
+                : null
+            }
+          />
         )}
         <AiNotice className="py-2" />
       </div>

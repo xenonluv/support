@@ -29,6 +29,20 @@ export function decideRoute(pathname: string, session: { role: Role | null } | n
   return null;
 }
 
+/** 로그인 화면으로 보낼 때, 로그인 뒤 돌아올 주소를 붙인다 (알림을 눌러 들어온 경우 등) */
+export function loginPath(from: string): string {
+  return from === "/" || !SAFE_PATH.test(from) ? "/login" : `/login?next=${encodeURIComponent(from)}`;
+}
+
+// 앱 안 경로만 (다른 사이트로 보내는 //host, 백슬래시, 주소창 문자 차단)
+const SAFE_PATH = /^\/[A-Za-z0-9/_-]*$/;
+
+/** 로그인 뒤 갈 곳: 안전한 앱 안 경로이고 그 역할이 볼 수 있는 화면이면 그곳, 아니면 역할별 첫 화면 */
+export function afterLogin(next: unknown, role: Role): string {
+  if (typeof next !== "string" || !SAFE_PATH.test(next) || next.startsWith("//") || under(next, "/login") || under(next, "/api")) return HOME[role];
+  return decideRoute(next, { role }) === null ? next : HOME[role];
+}
+
 /** 관리자가 비밀 키로만 바꿀 수 있는 app_metadata에서 역할을 읽는다. */
 export function roleFromMetadata(meta: unknown): Role | null {
   if (typeof meta !== "object" || meta === null) return null;

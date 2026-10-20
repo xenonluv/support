@@ -20,6 +20,9 @@ const SECTIONS: { title: string; items: React.ReactNode[] }[] = [
       <>안드로이드 크롬: 오른쪽 위 ⋮ → &lsquo;홈 화면에 추가&rsquo;</>,
       <>삼성 인터넷: 아래 ≡ → &lsquo;현재 페이지 추가&rsquo; → &lsquo;홈 화면&rsquo;</>,
       <>아이폰 사파리: 아래 공유 버튼(네모에 위 화살표) → &lsquo;홈 화면에 추가&rsquo;</>,
+      <>
+        <strong>관리자 알림:</strong> 오늘의 방문 위 [알림 받기] → &lsquo;허용&rsquo; → [테스트 알림]으로 확인. 아이폰은 홈 화면에 추가한 앱에서 켜야 하고, 앱을 닫아도 알림이 옵니다.
+      </>,
     ],
   },
   {

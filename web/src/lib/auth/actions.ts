@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { HOME, roleFromMetadata } from "@/lib/auth/routes";
+import { afterLogin, roleFromMetadata } from "@/lib/auth/routes";
 import { createClient } from "@/lib/supabase/server";
 
 export type LoginState = { error: string | null };
@@ -20,5 +20,5 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     await supabase.auth.signOut();
     return { error: "아직 역할이 지정되지 않은 계정입니다. 기관 담당자에게 문의해 주세요." };
   }
-  redirect(HOME[role]);
+  redirect(afterLogin(formData.get("next"), role));
 }

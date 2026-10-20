@@ -2,14 +2,17 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ClipboardList, Mic } from "lucide-react";
 import { MINE_CARD, MineBadge } from "@/components/mine-mark";
+import { PushSetup } from "@/components/push-setup";
 import { ToneBadge } from "@/components/tone-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { clientLabel } from "@/lib/client-label";
 import { seoulMonthDay } from "@/lib/records/dates";
 import { cn } from "@/lib/utils";
+import { vapidPublicKey } from "@/lib/push/send";
 import { getVisitCards } from "@/lib/visits/data";
 
 export default function VisitsPage() {
+  const pushKey = vapidPublicKey();
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -21,6 +24,7 @@ export default function VisitsPage() {
           </Link>
         </p>
       </div>
+      {pushKey && <PushSetup publicKey={pushKey} />}
       <Suspense fallback={<p className="text-sm text-muted-foreground">불러오는 중…</p>}>
         <ClientList />
       </Suspense>

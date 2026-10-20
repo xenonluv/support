@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decideRoute, roleFromMetadata } from "@/lib/auth/routes";
+import { afterLogin, decideRoute, loginPath, roleFromMetadata } from "@/lib/auth/routes";
 
 const worker = { role: "worker" } as const;
 const manager = { role: "manager" } as const;
@@ -74,5 +74,28 @@ describe("roleFromMetadata", () => {
     expect(roleFromMetadata({})).toBeNull();
     expect(roleFromMetadata(undefined)).toBeNull();
     expect(roleFromMetadata("worker")).toBeNull();
+  });
+});
+
+describe("로그인 뒤 돌아갈 곳", () => {
+  it("로그인 화면 주소에 원래 가려던 앱 안 경로를 붙인다", () => {
+    expect(loginPath("/visits/6f1c2b3a-1111-4222-8333-944455556666")).toBe("/login?next=%2Fvisits%2F6f1c2b3a-1111-4222-8333-944455556666");
+    expect(loginPath("/")).toBe("/login");
+  });
+
+  it("그 역할이 볼 수 있는 앱 안 경로면 그곳으로 간다", () => {
+    expect(afterLogin("/visits/6f1c2b3a-1111-4222-8333-944455556666", "worker")).toBe("/visits/6f1c2b3a-1111-4222-8333-944455556666");
+    expect(afterLogin("/signals/C-0012", "manager")).toBe("/signals/C-0012");
+  });
+
+  it("다른 사이트·다른 역할 화면·잘못된 값이면 역할별 첫 화면", () => {
+    expect(afterLogin("//evil.example", "worker")).toBe("/visits");
+    expect(afterLogin("https://evil.example", "worker")).toBe("/visits");
+    expect(afterLogin("/\\evil.example", "worker")).toBe("/visits");
+    expect(afterLogin("/signals", "worker")).toBe("/visits");
+    expect(afterLogin("/login", "manager")).toBe("/signals");
+    expect(afterLogin("/api/records", "worker")).toBe("/visits");
+    expect(afterLogin("", "manager")).toBe("/signals");
+    expect(afterLogin(null, "worker")).toBe("/visits");
   });
 });

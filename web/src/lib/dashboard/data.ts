@@ -84,11 +84,14 @@ export async function getDashboard(days: number): Promise<Dashboard & { asOf: Da
 
 export type AlertInfo = { id: string; body: string; copiedAt: string | null };
 export type ClientDetail = {
+  id: string;
   item: PriorityClient | null;
   code: string;
   ageBand: number | null;
   dong: string;
   alert: AlertInfo | null;
+  /** 현장인력에게 마지막으로 보낸 웹푸시 알림 */
+  lastPush: { createdAt: string; delivered: number | null } | null;
   /** 화면 데이터를 읽은 시각 — 상태 변경 범위를 이 시각까지로 묶는다 */
   asOf: string;
 };
@@ -101,7 +104,7 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
   const { data: client } = await supabase.from("clients").select("id, code, age_band, dong").eq("code", code).maybeSingle();
   if (!client) return null;
   const display = { id: client.id, code: client.code, ageBand: client.age_band, dong: client.dong };
-  const [item, { data: alerts }] = await Promise.all([
+  const [item, { data: alerts }, { data: pushes }] = await Promise.all([
     loadClientSignals(supabase, display, now),
     supabase
       .from("alert_drafts")
@@ -111,14 +114,18 @@ export async function getClientDetail(code: string): Promise<ClientDetail | null
       .neq("flags.status", "resolved")
       .order("created_at", { ascending: false })
       .limit(1),
+    supabase.from("push_alerts").select("created_at, delivered_count").eq("client_id", client.id).order("created_at", { ascending: false }).limit(1),
   ]);
   const latest = alerts?.[0];
+  const push = pushes?.[0];
   return {
+    id: client.id,
     item,
     code: client.code,
     ageBand: client.age_band,
     dong: client.dong,
     alert: latest ? { id: latest.id, body: latest.body, copiedAt: latest.copied_at } : null,
+    lastPush: push ? { createdAt: push.created_at, delivered: push.delivered_count } : null,
     asOf: now.toISOString(),
   };
 }

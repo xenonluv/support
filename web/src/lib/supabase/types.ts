@@ -281,6 +281,86 @@ export type Database = {
           },
         ]
       }
+      push_alerts: {
+        Row: {
+          client_id: string
+          created_at: string
+          delivered_count: number | null
+          device_count: number
+          id: string
+          recipient_count: number
+          sender_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          delivered_count?: number | null
+          device_count?: number
+          id?: string
+          recipient_count?: number
+          sender_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          delivered_count?: number | null
+          device_count?: number
+          id?: string
+          recipient_count?: number
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_alerts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_alerts_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          worker_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          worker_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visit_records: {
         Row: {
           agency_id: string
@@ -394,6 +474,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      finish_client_alert: {
+        Args: { p_alert_id: string; p_delivered: number; p_expired: string[] }
+        Returns: undefined
+      }
       keepalive: { Args: never; Returns: string }
       list_agencies: {
         Args: never
@@ -411,6 +495,20 @@ export type Database = {
           p_partner_ids: string[]
         }
         Returns: string
+      }
+      save_push_subscription: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string }
+        Returns: undefined
+      }
+      send_client_alert: {
+        Args: { p_client_id: string }
+        Returns: {
+          alert_id: string
+          auth: string
+          endpoint: string
+          p256dh: string
+          subscription_id: string
+        }[]
       }
       set_client_closed: {
         Args: { p_client_id: string; p_closed: boolean }

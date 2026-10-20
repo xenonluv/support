@@ -277,5 +277,58 @@ await admin.from("briefings").delete().eq("body", "RLS 검사용"); // 검사용
   }
 }
 
+// 10) 웹푸시 알림: 기기는 본인 것만, 보내기는 대상자를 볼 수 있는 관리자만, 받는 사람은 그 대상자와 연결된 기관의 현장 인력
+{
+  const endpointA = `https://push.example.invalid/rls-a-${Date.now()}`;
+  const endpointB = `https://push.example.invalid/rls-b-${Date.now()}`;
+  const alertIds: string[] = [];
+  try {
+    const savedA = await workerA.rpc("save_push_subscription", { p_endpoint: endpointA, p_p256dh: "k", p_auth: "s" });
+    const savedB = await workerB.rpc("save_push_subscription", { p_endpoint: endpointB, p_p256dh: "k", p_auth: "s" });
+    check("현장 인력은 자기 기기를 알림 기기로 저장한다", !savedA.error && !savedB.error, savedA.error?.code ?? savedB.error?.code ?? "");
+    const seenByA = (await workerA.from("push_subscriptions").select("endpoint")).data ?? [];
+    check("A 현장은 자기 기기만 본다", seenByA.length > 0 && seenByA.every((r) => r.endpoint !== endpointB), `${seenByA.length}건`);
+    const direct = await workerA.from("push_subscriptions").insert({ worker_id: me.user?.id, endpoint: `${endpointA}-x`, p256dh: "k", auth: "s" });
+    check("기기 저장은 함수로만 된다 (직접 쓰기 거부)", Boolean(direct.error), direct.error?.code ?? "들어감");
+    const stolen = await workerB.rpc("save_push_subscription", { p_endpoint: endpointA, p_p256dh: "other", p_auth: "other" });
+    check("다른 사람 기기 주소만으로는 그 기기를 가로챌 수 없다", stolen.error?.code === "42501", stolen.error?.code ?? "바뀜");
+    const shared = await workerB.rpc("save_push_subscription", { p_endpoint: endpointA, p_p256dh: "k", p_auth: "s" });
+    const ownerAfter = (await admin.from("push_subscriptions").select("worker_id").eq("endpoint", endpointA).single()).data?.worker_id;
+    check("같은 기기(같은 키)로 다른 사람이 로그인하면 주인이 바뀐다 (공용 폰)", !shared.error && ownerAfter === workerBMe.user?.id, shared.error?.code ?? "");
+    await workerA.rpc("save_push_subscription", { p_endpoint: endpointA, p_p256dh: "k", p_auth: "s" }); // 다시 A 기기로
+    const badUrl = await workerA.rpc("save_push_subscription", { p_endpoint: "http://push.example.invalid/x", p_p256dh: "k", p_auth: "s" });
+    check("https가 아닌 주소는 거부한다", badUrl.error?.code === "22023", badUrl.error?.code ?? "들어감");
+
+    const byWorker = await workerA.rpc("send_client_alert", { p_client_id: c12?.id });
+    check("현장 인력은 알림을 보낼 수 없다", byWorker.error?.code === "42501", byWorker.error?.code ?? "보내짐");
+    const otherClient = await managerA.rpc("send_client_alert", { p_client_id: target?.id });
+    check("A 관리자는 맡지 않은 C-0063에 알림을 보낼 수 없다", otherClient.error?.code === "42501", otherClient.error?.code ?? "보내짐");
+
+    // 1분 안 다시 보내기 제한에 걸리지 않게, 직전 실행·시험으로 남은 C-0012 알림 기록을 먼저 지운다
+    await admin.from("push_alerts").delete().eq("client_id", c12?.id).gt("created_at", new Date(Date.now() - 120_000).toISOString());
+    const sent = await managerA.rpc("send_client_alert", { p_client_id: c12?.id });
+    const rows = (sent.data ?? []) as { alert_id: string; subscription_id: string | null; endpoint: string | null }[];
+    if (rows[0]) alertIds.push(rows[0].alert_id);
+    const endpoints = rows.map((r) => r.endpoint);
+    check("A 관리자가 C-0012에 보내면 A·B 기관 현장 인력 기기가 모두 받는 사람이다", endpoints.includes(endpointA) && endpoints.includes(endpointB), sent.error?.code ?? `${rows.length}대`);
+    const again = await managerA.rpc("send_client_alert", { p_client_id: c12?.id });
+    check("같은 대상자에 1분 안에 다시 보내면 거절한다", again.error?.message === "too-soon", again.error?.message ?? "보내짐");
+
+    const alertsByWorker = (await workerA.from("push_alerts").select("id")).data ?? [];
+    const alertsByManager = (await managerA.from("push_alerts").select("id").in("id", alertIds)).data ?? [];
+    check("보낸 기록은 관리자만 본다", alertsByWorker.length === 0 && alertsByManager.length === 1, `현장 ${alertsByWorker.length}, 관리자 ${alertsByManager.length}`);
+
+    const subB = rows.find((r) => r.endpoint === endpointB)?.subscription_id;
+    const finishByWorker = await workerA.rpc("finish_client_alert", { p_alert_id: alertIds[0], p_delivered: 1, p_expired: [] });
+    check("보낸 사람이 아니면 결과를 적을 수 없다", finishByWorker.error?.code === "42501", finishByWorker.error?.code ?? "적힘");
+    const finish = await managerA.rpc("finish_client_alert", { p_alert_id: alertIds[0], p_delivered: 1, p_expired: subB ? [subB] : [] });
+    const leftB = (await admin.from("push_subscriptions").select("id").eq("endpoint", endpointB)).data ?? [];
+    check("보낸 사람은 만료된 받는 사람 기기를 지운다", !finish.error && leftB.length === 0, finish.error?.code ?? `${leftB.length}건 남음`);
+  } finally {
+    await admin.from("push_subscriptions").delete().in("endpoint", [endpointA, endpointB, `${endpointA}-x`]);
+    if (alertIds.length) await admin.from("push_alerts").delete().in("id", alertIds);
+  }
+}
+
 console.log(failures === 0 ? "\n모든 RLS 검사 통과" : `\n실패 ${failures}건`);
 process.exit(failures === 0 ? 0 : 1);
