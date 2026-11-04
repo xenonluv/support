@@ -1,0 +1,91 @@
+<?svml using="@hypit/markup@1"?>
+<svml>
+  <import as="audio" from="@hypit/audio-track@1"/>
+  <import as="visual" from="@hypit/visual-track@1"/>
+  <import from="@hypit/script@1"/>
+  <import as="text" from="@hypit/text@1"/>
+  <import as="seedance" from="@hypit/seedance@1"/>
+  <import as="mediaop" from="@hypit/media-operations@1"/>
+  <import as="asset" from="@hypit/media@1"/>
+  <import as="time" from="@hypit/timeline-author@1"/>
+  <import as="space" from="@hypit/spatial@1"/>
+  <import as="typo" from="@hypit/text-fine@1"/>
+  <import as="film" from="@hypit/film@1"/>
+  <import as="html" from="@hypit/html-video@1"/>
+  <import as="look" source="./look.svs"/>
+
+  <!-- 1부: 가상 발표자(Seedance 생성, 한국어 립싱크 시험) -->
+  <script id="story">
+    <opening><HOST>방문 끝나고, 딱 30초만 말해 주세요. 돌봄기록 초안은 돌봄이음이 만들어 드립니다.</opening>
+  </script>
+
+  <space:Canvas id="canvas" width="720" height="1280"/>
+  <time:Clock id="clock" frame-rate="30"/>
+  <space:Frame id="full" within={canvas.bounds} left="0%" top="0%" right="100%" bottom="100%"/>
+  <space:Frame id="phone" within={canvas.bounds} left="14%" top="17%" right="86%" bottom="97%"/>
+  <space:Frame id="label-frame" within={canvas.bounds} left="6%" top="4%" right="94%" bottom="14%"/>
+
+  <text:Value id="presenter-prompt">
+    A realistic vertical phone video, medium close-up, steady fixed framing. A Korean woman in her
+    late thirties, a community elderly-care worker, wearing a navy cardigan over a white shirt with
+    a lanyard ID card, sits at a tidy desk in a bright community welfare center office with soft
+    daylight from a window. She looks into the camera and speaks Korean warmly and clearly with
+    natural lip-sync, a friendly smile and one small open-palm gesture on the promise. No subtitles,
+    captions, logos or readable on-screen text.
+
+    SCRIPT TO DELIVER (Korean, exactly as written): 방문 끝나고, 딱 30초만 말해 주세요. 돌봄기록 초안은 돌봄이음이 만들어 드립니다.
+  </text:Value>
+  <seedance:TextVideo id="presenter" model="mini" prompt={presenter-prompt}
+    duration="7" aspect-ratio="9:16" generate-audio="true"/>
+  <mediaop:Normalize id="presenter-media" source={presenter.video} clock={clock}
+    video="primary-moving" audio="default" span-authority="video"/>
+
+  <!-- 2부: 실제 앱 화면 + 기존 '도현' 내레이션 -->
+  <asset:Image id="shot-record" src="../assets/w_record_recording.png"/>
+  <asset:Image id="shot-transcript" src="../assets/w_record_transcript.png"/>
+  <asset:Image id="shot-draft" src="../assets/w_record_draft.png"/>
+  <space:Extent id="shot-size" width="1170" height="2532"/>
+  <asset:Audio id="vo-record" src="../assets/ep02_01.mp3"/>
+  <asset:Audio id="vo-transcript" src="../assets/ep02_02.mp3"/>
+  <asset:Audio id="vo-draft" src="../assets/ep02_03.mp3"/>
+  <mediaop:Normalize id="vo-record-media" source={vo-record} clock={clock} video="none" audio="default" span-authority="audio"/>
+  <mediaop:Normalize id="vo-transcript-media" source={vo-transcript} clock={clock} video="none" audio="default" span-authority="audio"/>
+  <mediaop:Normalize id="vo-draft-media" source={vo-draft} clock={clock} video="none" audio="default" span-authority="audio"/>
+
+  <time:Timeline id="program" clock={clock} end="draft.end">
+    <time:Window id="opening" from="start" for={presenter-media.extent}/>
+    <time:Window id="record" from="opening.end" for={vo-record-media.extent}/>
+    <time:Window id="transcript" from="record.end" for={vo-transcript-media.extent}/>
+    <time:Window id="draft" from="transcript.end" for={vo-draft-media.extent}/>
+  </time:Timeline>
+
+  <audio:Track id="sound" timeline={program.timeline}>
+    <audio:Clip id="presenter-voice" source={presenter-media.media} during={program.opening}/>
+    <audio:Clip id="vo1" source={vo-record-media.media} during={program.record}/>
+    <audio:Clip id="vo2" source={vo-transcript-media.media} during={program.transcript}/>
+    <audio:Clip id="vo3" source={vo-draft-media.media} during={program.draft}/>
+  </audio:Track>
+  <visual:Track id="picture" timeline={program.timeline}>
+    <visual:Clip id="presenter-picture" media={presenter-media.media} during={program.opening} frame={full} z="10" fit="cover"/>
+    <visual:Clip id="s1" image={shot-record} extent={shot-size} during={program.record} frame={phone} z="10" fit="contain"/>
+    <visual:Clip id="s2" image={shot-transcript} extent={shot-size} during={program.transcript} frame={phone} z="10" fit="contain"/>
+    <visual:Clip id="s3" image={shot-draft} extent={shot-size} during={program.draft} frame={phone} z="10" fit="contain"/>
+  </visual:Track>
+
+  <asset:Font id="label-font" src="../assets/Pretendard-Bold.woff2" weight="700" style="normal"/>
+  <typo:Style id="label-style" recipe={look.text.label} font={label-font}>
+    <typo:Fill color="#1E2A5A"/>
+  </typo:Style>
+  <typo:Flow id="label1" timeline={program.timeline} within={label-frame} style={label-style} z="20" during={program.record}>① 녹음 시작</typo:Flow>
+  <typo:Flow id="label2" timeline={program.timeline} within={label-frame} style={label-style} z="20" during={program.transcript}>② 바로 글자로</typo:Flow>
+  <typo:Flow id="label3" timeline={program.timeline} within={label-frame} style={label-style} z="20" during={program.draft}>③ AI 기록 초안</typo:Flow>
+
+  <film:Film id="main" canvas={canvas.canvas} timeline={program.timeline} appearance={look.film.main}>
+    <film:Track source={picture.visual}/>
+    <film:Track source={sound.audio}/>
+    <film:Track source={label1.visual}/>
+    <film:Track source={label2.visual}/>
+    <film:Track source={label3.visual}/>
+  </film:Film>
+  <html:Video id="final" composition={main.composition} timeline={program.timeline}/>
+</svml>

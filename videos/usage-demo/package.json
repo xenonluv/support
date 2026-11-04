@@ -1,0 +1,17 @@
+{
+  "name": "usage-demo",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@hypit/hypit": "^0.3.1",
+    "@hypit/provider-hiapi": "^0.1.0"
+  },
+  "private": true,
+  "hypit": {
+    "project": true
+  }
+}

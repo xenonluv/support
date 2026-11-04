@@ -1,0 +1,4 @@
+# 설치·실행 산출물 (용량이 커서 올리지 않는다)
+node_modules/
+.hypit/
+renders/

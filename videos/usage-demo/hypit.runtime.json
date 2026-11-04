@@ -1,0 +1,45 @@
+{
+  "format": "hypit.runtime-local@1",
+  "dataRoot": ".hypit/runtimes/local",
+  "credentials": {
+    "local": {
+      "use": "@hypit/credential-store-local"
+    }
+  },
+  "endpoints": {
+    "hypihub.default": {
+      "use": "@hypit/provider-hypihub",
+      "config": {
+        "baseUrl": "https://hypit.ai",
+        "apiKey": {
+          "store": "local",
+          "key": "hypihub.oauth"
+        }
+      }
+    },
+    "media.local": {
+      "use": "@hypit/media-local"
+    },
+    "html.local": {
+      "use": "@hypit/provider-html-local"
+    },
+    "image.opencv.local": {
+      "use": "@hypit/provider-image-opencv-local"
+    },
+    "hiapi.default": {
+      "use": "@hypit/provider-hiapi",
+      "pool": "hiapi.default",
+      "config": {
+        "apiKey": {
+          "store": "local",
+          "key": "hiapi.api-key"
+        },
+        "defaultConcurrency": 3,
+        "pollIntervalMs": 10000
+      }
+    }
+  },
+  "bindings": {
+    "@hypit/seedance@1#seedance-2-mini": "hiapi.default"
+  }
+}
